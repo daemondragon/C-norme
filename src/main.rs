@@ -1,5 +1,3 @@
-use std::fs::File;
-
 mod rules;
 use rules::Rule;
 

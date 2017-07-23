@@ -33,7 +33,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 ## Rule implementation progression
 
 ### Global
-- [ ] No more than 80 characters per line (including newline character).
+- [x] No more than 80 characters per line (including newline character).
 - [ ] Space instead of tab.
 - [ ] No trailing whitespace.
 - [ ] Multiline comments delimiters must appear on their on line.
