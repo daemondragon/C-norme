@@ -1,13 +1,21 @@
-mod rules;
+use std::fs::File;
 
+mod rules;
 use rules::Rule;
 
-fn main() {
-	let line_size = rules::LineSize::new(80);
-
-	if let Some(errors) = line_size.verify("test.src", "Content") {
-		for error in errors.iter() {
-			println!("{}", error);
+fn verify(rules: Vec<Box<Rule>>, filename: &str, content: &str) {
+	for rule in rules.iter() {
+		if let Some(errors) = rule.verify(filename, content) {
+			for error in errors.iter() {
+				println!("{}", error);
+			}
 		}
 	}
+}
+
+fn main() {
+	let mut rules = Vec::<Box<Rule>>::new();
+	rules.push(Box::new(rules::LineSize::new(80)));
+
+	verify(rules, "test.c", "content");	
 }

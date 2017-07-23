@@ -43,7 +43,6 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
 - [ ] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
 - [ ] When macro must span over multiple lines, escape line break ('\') must be aligned.
-
 - [ ] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
 
