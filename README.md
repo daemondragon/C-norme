@@ -19,7 +19,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 	time as mentionned.
 * Detecting if code langage is in english and no other langage is used.
 * Detecting unused function (use your compiler).
-
+* Detecting if composite names are seprated with underscores.
 
 #Global progression
 
@@ -27,4 +27,13 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] Reading a file and checking its norme.
 - [ ] Reading all contents of a directory.
 
-#Rule implemenatatio progression
+#Rule implementation progression
+
+###Global
+- [ ] No more than 80 characters per line (including newline character).
+- [ ] Space instead of tab.
+- [ ] No trailing whitespace.
+
+###Macro
+- [ ] Macro names must be entirely captitalized.
+- [ ] Macro arguments must be capitalized.
