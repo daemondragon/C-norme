@@ -37,6 +37,9 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Space instead of tab.
 - [x] No trailing whitespace.
 - [ ] Multiline comments delimiters must appear on their on line.
+- [x] Closing brace must appear on the same column at the corresponding opening brace.
+- [x] The text between brace must be instented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
+- [x] All braces must be on their own line.
 
 ### Preprocessor and macro
 - [ ] Preprocessor directive must appear on the first column.
