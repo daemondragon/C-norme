@@ -25,7 +25,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 ## Global progression
 
 - [x] Basic rule trait.
-- [ ] Reading a file and checking its norme.
+- [x] Reading a file and checking its norme.
 - [ ] Reading all contents of a directory.
 - [ ] Multiprocessing rules check (useful for big project).
 - [ ] Correcting file to match norme.
