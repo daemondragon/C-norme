@@ -34,8 +34,8 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 
 ### Global
 - [x] No more than 80 characters per line (including newline character).
-- [ ] Space instead of tab.
-- [ ] No trailing whitespace.
+- [x] Space instead of tab.
+- [x] No trailing whitespace.
 - [ ] Multiline comments delimiters must appear on their on line.
 
 ### Preprocessor and macro
@@ -45,5 +45,12 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] When macro must span over multiple lines, escape line break ('\') must be aligned.
 - [ ] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
+
+### Functions
+- [ ] Function's body must not contain more than 25 lines (excluding comments and blank line).
+- [ ] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
+- [ ] Function must not have more than four arguments.
+- [ ] There must be at most five exported functions per source file.
+- [ ] There must be at most ten function per source file.
 
 More rules to be added later...
