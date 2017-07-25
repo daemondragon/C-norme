@@ -17,6 +17,24 @@ impl Rule for MultiLinesComment {
 		let mut in_comment = false;
 
 		for line in content.lines() {
+			if line.contains("*/") && !line.contains("/*") {
+				//Multi lines comment
+				if !in_comment {
+					errors.push(format!("[{}:{}]Unexpected comment end delimiter.", filename, line_number));
+				}
+
+				if line.chars().filter(|c| !c.is_whitespace()).count() != 2 {
+					errors.push(format!("[{}:{}]Comment end delimiter must appear on its own line.", filename, line_number));
+				}
+				in_comment = false;
+			}
+
+			if in_comment {
+				if !line.trim_left().starts_with("**") {
+					errors.push(format!("[{}:{}]Comment intermediary line must start with '**'.", filename, line_number));
+				}
+			}
+
 			if line.contains("/*") && !line.contains("*/") {
 				//Multi lines comment
 				if in_comment {
@@ -31,23 +49,6 @@ impl Rule for MultiLinesComment {
 
 			}
 
-			if line.contains("*/") && !line.contains("/*") {
-				//Multi lines comment
-				if !in_comment {
-					errors.push(format!("[{}:{}]Unexpected comment end delimiter.", filename, line_number));
-				}
-
-				if line.chars().filter(|c| !c.is_whitespace()).count() != 2 {
-					errors.push(format!("[{}:{}]Comment end delimiter must appear on its own line.", filename, line_number));
-				}
-				in_comment = false;
-			}
-
-			if in_comment {
-				if line.trim().len() < 2 || !line.trim_left().starts_with("**") {
-					errors.push(format!("[{}:{}]Comment intermediary line must start with '**'.", filename, line_number));
-				}
-			}
 			line_number += 1;
 		}
 
@@ -64,7 +65,17 @@ mod test {
 	use super::*;
 	#[test]
 	fn multi_lines_comment() {
-		let multi_lines_comment = MultiLinesComment::new(5);
+		let multi_lines_comment = MultiLinesComment::new();
 
+		assert_eq!(multi_lines_comment.verify("", "zdnkcndccc").len(), 0);
+		assert_eq!(multi_lines_comment.verify("", "//zdnkcndccc").len(), 0);
+		assert_eq!(multi_lines_comment.verify("", "/*zdnkcndccc*/").len(), 0);
+		assert_eq!(multi_lines_comment.verify("", "/*\n**zdnkcn\n*/").len(), 0);
+
+		assert_ne!(multi_lines_comment.verify("", "/*zdnkcn\ndccc*/").len(), 0);
+		assert_ne!(multi_lines_comment.verify("", "/*\nzdnkcn\n*/").len(), 0);
+		assert_ne!(multi_lines_comment.verify("", "/*\nav**zdnkcn\n*/").len(), 0);
+		assert_ne!(multi_lines_comment.verify("", "/** *\n**zdnkcn\n*/").len(), 0);
+		assert_ne!(multi_lines_comment.verify("", "/**\n**zdnkcn\n*/*").len(), 0);
 	}
 }
