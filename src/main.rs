@@ -15,6 +15,8 @@ fn main() {
 	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::IndentationLevel::new(4)));
 
+	rules.push(Box::new(rules::MultiLinesComment::new()));
+
 	//COMMAND LINE
 	for filename in env::args().skip(1) {
 

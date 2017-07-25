@@ -4,9 +4,14 @@ The goal of this program is to create a tool that will check EPITA C norme.
 The non respect of this will result with a 0 mark, so having an automated tool to check it
 is really useful.
 
+The respect of this goal mean that their must not have **ANY** false negative (No errors were found where it should have):
+if a goal passe all test it respect the rule. That mean that this norme-checker is allowed to have some false positive
+(The checker detect an error when it shouldn't).
+
+Some [norme] rules might depend on more than one [checker] rule to work. 
+
 An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingstyle/codingstyle.pdf).
 *Note that this is an old norme, and new rules might have been added*
-
 
 ## Features
 
@@ -36,10 +41,13 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] No more than 80 characters per line (including newline character).
 - [x] Space instead of tab.
 - [x] No trailing whitespace.
-- [ ] Multiline comments delimiters must appear on their on line.
 - [x] Closing brace must appear on the same column at the corresponding opening brace.
 - [x] The text between brace must be instented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
 - [x] All braces must be on their own line.
+
+### Comment
+- [x] Multiline comments delimiters must appear on their on line.
+- [x] Multiline comments intermediary line must start with **
 
 ### Preprocessor and macro
 - [ ] Preprocessor directive must appear on the first column.

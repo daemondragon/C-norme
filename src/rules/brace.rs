@@ -65,7 +65,7 @@ impl Rule for IndentationLevel {
 			if line.trim().len() > 0 {
 				let current_indentation = line.len() - line.trim_left().len();
 				if current_indentation != indentation_level * self.nb_spaces {
-					errors.push(format!("[{}:{}]Wrong indentation level. Expected {} got {}",
+					errors.push(format!("[{}:{}]Wrong indentation level. Expected {} whitespaces got {}",
 						filename, line_number, indentation_level * self.nb_spaces, current_indentation));
 				} 
 			}
@@ -78,7 +78,7 @@ impl Rule for IndentationLevel {
 		}
 
 		if indentation_level > 0 {
-			errors.push(format!("[{}:{}]Expected closing brace.", filename, line_number));
+			errors.push(format!("[{}:{}]Expected {} more closing brace.", filename, line_number, indentation_level));
 		}
 
 		return errors;
