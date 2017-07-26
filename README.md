@@ -50,12 +50,15 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Multiline comments intermediary line must start with **
 
 ### Preprocessor and macro
-- [ ] Preprocessor directive must appear on the first column.
+- [x] Preprocessor directive must appear on the first column.
 - [ ] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
-- [ ] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
+- [x] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
 - [ ] When macro must span over multiple lines, escape line break ('\') must be aligned.
 - [ ] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
+- [ ] All #include directive must appear at the start of the file.
+- [ ] System header must appear before local one. In header (.h) file only.
+- [ ] Headers must be protected against multiple inclusions. *See official norme for more info*.
 
 ### Functions
 - [ ] Function's body must not contain more than 25 lines (excluding comments and blank line).
@@ -63,5 +66,18 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] Function must not have more than four arguments.
 - [ ] There must be at most five exported functions per source file.
 - [ ] There must be at most ten function per source file.
+
+### Enumeration
+- [ ] Enumerations values must be entirely capitalized.
+- [ ] Enumerations values must appear on their own line.
+
+### Naming convention
+- [ ] Global variables must start with 'g_'.
+
+### Typedef
+- [ ] Structures names must be prefixed by 's_'.
+- [ ] Unions names must be prefixed by 'u_'.
+- [ ] Enumerations names must be prefixed by 'e_'.
+- [ ] If the type already have 'e_', 'f_', 's_', 't_', 'u_' as prefix, it has to be keep.
 
 More rules to be added later...
