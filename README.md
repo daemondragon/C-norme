@@ -53,7 +53,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Preprocessor directive must appear on the first column.
 - [ ] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
 - [x] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
-- [ ] When macro must span over multiple lines, escape line break ('\') must be aligned.
+- [x] When macro must span over multiple lines, escape line break ('\') must be aligned.
 - [ ] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
 - [ ] All #include directive must appear at the start of the file.

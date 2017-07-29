@@ -19,6 +19,7 @@ fn main() {
 
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
 	rules.push(Box::new(rules::PreprocessorComment::new()));
+	rules.push(Box::new(rules::MultiLinesPreprocessor::new()));
 
 	//COMMAND LINE
 	for filename in env::args().skip(1) {
