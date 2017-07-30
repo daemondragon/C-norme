@@ -52,11 +52,11 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 
 ### Preprocessor and macro
 - [x] Preprocessor directive must appear on the first column.
-- [ ] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
+- [x] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
 - [x] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
 - [x] When macro must span over multiple lines, escape line break ('\\') must be aligned.
 - [x] Macro names must be entirely captitalized.
-- [ ] Macro arguments must be capitalized.
+- [x] Macro arguments must be capitalized.
 - [x] All #include directive must appear at the start of the file.
 - [x] System header must appear before local one. In header (.h) file only.
 - [x] Headers must be protected against multiple inclusions. *See official norme for more info*.

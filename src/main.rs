@@ -26,11 +26,10 @@ fn main() {
 	rules.push(Box::new(rules::PreprocessorComment::new()));
 	rules.push(Box::new(rules::MultiLinesMacro::new()));
 	rules.push(Box::new(rules::MacroName::new()));
+	rules.push(Box::new(rules::MacroArguments::new()));
 	rules.push(Box::new(rules::IncludePreprocessor::new()));
 	rules.push(Box::new(rules::IncludeOrder::new()));
 	rules.push(Box::new(rules::HeaderGuard::new()));
-
-
 
 	for arg in env::args().skip(1) {
 		verify_file_or_directory(&rules, &arg);

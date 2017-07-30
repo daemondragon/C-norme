@@ -177,7 +177,7 @@ impl Rule for MacroName {
 					let macro_name = macro_name.split("(").next().unwrap();
 
 					if macro_name != macro_name.to_uppercase() {
-						errors.push(format!("[{}:{}]Macro must have be entirely capitalized. Expected \"{}\" got \"{}\"", filename, line_number, macro_name.to_uppercase(), macro_name));
+						errors.push(format!("[{}:{}]Macro name must have be entirely capitalized. Expected \"{}\" got \"{}\"", filename, line_number, macro_name.to_uppercase(), macro_name));
 					}
 				}
 			}
@@ -188,6 +188,68 @@ impl Rule for MacroName {
 		return errors;
 	}
 }
+
+
+
+pub struct MacroArguments {
+	
+}
+
+impl MacroArguments {
+	pub fn new() -> MacroArguments {
+		MacroArguments {  }
+	}
+}
+
+//Expect PreprocessorOnFirstColumn rule true for the given file,
+impl Rule for MacroArguments {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+
+		let mut in_macro = false;
+		let mut in_argument = false;
+
+		for line in content.lines() {
+			if line.starts_with("#") {
+				in_macro = true;
+			}
+
+			if in_macro {
+				let mut line = line;
+				if line.contains("(") {
+					in_argument = true;
+					line = line.split("(").nth(1).unwrap();
+				}
+				line = line.split(")").next().unwrap();
+
+				if in_argument {
+					for arg in line.split(",").map(|x| x.trim()).filter(|x| !x.is_empty()) {
+						let temp_lower: String = arg.chars().skip(1).collect();
+						let good_macro_name = arg.chars().next().unwrap().to_string().to_uppercase() +
+							&(temp_lower).to_lowercase();
+					
+						if good_macro_name != arg {
+							errors.push(format!("[{}:{}]Macro arguments must have be capitalized. Expected \"{}\" got \"{}\"", filename, line_number, good_macro_name, arg));
+						}
+					}
+				}
+				
+				if line.contains(")") {
+					in_argument = false;
+				}
+
+				in_macro =line.contains("\\");
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
 
 
 //All #include directive must appear at the start of the file.
@@ -388,6 +450,22 @@ mod test {
 		assert_eq!(macro_name.verify("", "#define  Name").len(), 1);
 		assert_eq!(macro_name.verify("", "#define  name_lower_Case").len(), 1);
 		assert_eq!(macro_name.verify("", "#define  zefrg(TEST ad)\\\n czdeff").len(), 1);
+	}
+
+	#[test]
+	fn macro_arguments() {
+		let macro_arguments = MacroArguments::new();
+
+		assert_eq!(macro_arguments.verify("", "#ifdef HELLO").len(), 0);
+		assert_eq!(macro_arguments.verify("", "#define WORLD 10").len(), 0);
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(Lower_case)").len(), 0);
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(Lower_case, Good_case) CODE").len(), 0);
+
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(lower_case)").len(), 1);
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(lower_case, UPPERCASE)").len(), 2);
+
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(lower_case,\\\n UPPERCASE)").len(), 2);
+		assert_eq!(macro_arguments.verify("", "#ifndef MACRO_NAME(Lower_case,\\\n Good_case) CODE").len(), 0);
 	}
 
 	#[test]

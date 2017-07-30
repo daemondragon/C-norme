@@ -14,6 +14,7 @@ pub use self::preprocessor::{PreprocessorOnFirstColumn,
 							 PreprocessorComment,
 							 MultiLinesMacro,
 							 MacroName,
+							 MacroArguments,
 							 IncludePreprocessor,
 							 IncludeOrder,
 							 HeaderGuard};
