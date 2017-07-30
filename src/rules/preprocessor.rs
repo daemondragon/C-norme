@@ -29,6 +29,51 @@ impl Rule for PreprocessorOnFirstColumn {
 
 
 
+pub struct PreprocessorIndentation {
+
+}
+
+impl PreprocessorIndentation {
+	pub fn new() -> PreprocessorIndentation {
+		PreprocessorIndentation {  }
+	}
+}
+
+//Expect PreprocessorOnFirstColumn rule true for the given file
+impl Rule for PreprocessorIndentation {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut current_indentation_level: usize = 0;
+
+		for line in content.lines() {
+			if line.starts_with("#") {
+				if ["else", "endif"].iter().any(|x| line.contains(x)) {
+					current_indentation_level -= 1;
+				}
+
+				let line_without_first_char: String = line.chars().skip(1).collect();
+
+				let nb_whitespaces = line.len() - line_without_first_char.trim_left().len() - 1;
+				if nb_whitespaces != current_indentation_level {
+					errors.push(format!("[{}:{}]Expected {} white space after #, found {}.", filename, line_number, current_indentation_level, nb_whitespaces));
+				}
+
+				if ["if", "else"].iter().any(|x| line.contains(x)) {
+					current_indentation_level += 1;
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
 pub struct PreprocessorComment {
 	
 }
@@ -288,6 +333,18 @@ mod test {
 		assert_eq!(preprocessor_on_first_column.verify("", " #\n\t#").len(), 2);
 		assert_eq!(preprocessor_on_first_column.verify("", "3#something").len(), 0);
 		assert_eq!(preprocessor_on_first_column.verify("", "adee#").len(), 0);
+	}
+
+	#[test]
+	fn preprocessor_indentation() {
+		let preprocessor_indentation = PreprocessorIndentation::new();
+
+		assert_eq!(preprocessor_indentation.verify("", "#if 0\n# define SOMETHING\n#endif").len(), 0);
+		assert_eq!(preprocessor_indentation.verify("", "#if 0\n#else\n#endif").len(), 0);
+
+		assert_eq!(preprocessor_indentation.verify("", "#ifndef SOMETHING\n#define SOMETHING\n#endif").len(), 1);
+		assert_eq!(preprocessor_indentation.verify("", "# ifdef SOMETHING\n# define SOMETHING\n#endif").len(), 1);
+		assert_eq!(preprocessor_indentation.verify("", "#if 0\n# define SOMETHING\nsome code\n#endif").len(), 0);
 	}
 
 	#[test]

@@ -7,27 +7,31 @@ mod rules;
 use rules::Rule;
 
 fn main() {
-	//RULES
 	let mut rules = Vec::<Box<Rule>>::new();
+	//space.rs
 	rules.push(Box::new(rules::LineSize::new(80)));
 	rules.push(Box::new(rules::SpaceIndentation::new()));
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
 
+	//brace.rs
 	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::IndentationLevel::new(4)));
 
+	//comment.rs
 	rules.push(Box::new(rules::MultiLinesComment::new()));
 
+	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
+	rules.push(Box::new(rules::PreprocessorIndentation::new()));
 	rules.push(Box::new(rules::PreprocessorComment::new()));
 	rules.push(Box::new(rules::MultiLinesMacro::new()));
 	rules.push(Box::new(rules::MacroName::new()));
 	rules.push(Box::new(rules::IncludePreprocessor::new()));
 	rules.push(Box::new(rules::IncludeOrder::new()));
 	rules.push(Box::new(rules::HeaderGuard::new()));
-	
 
-	//COMMAND LINE
+
+
 	for arg in env::args().skip(1) {
 		verify_file_or_directory(&rules, &arg);
 		

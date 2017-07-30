@@ -10,6 +10,7 @@ pub use self::brace::{OwnLineBrace,
 					  IndentationLevel};
 pub use self::comment::{MultiLinesComment};
 pub use self::preprocessor::{PreprocessorOnFirstColumn,
+							 PreprocessorIndentation,
 							 PreprocessorComment,
 							 MultiLinesMacro,
 							 MacroName,
