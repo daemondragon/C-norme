@@ -32,7 +32,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 
 - [x] Basic rule trait.
 - [x] Reading a file and checking its norme.
-- [ ] Reading all contents of a directory.
+- [x] Reading all contents of a directory.
 - [ ] Multiprocessing rules check (useful for big project).
 - [ ] Correcting file to match norme.
 
