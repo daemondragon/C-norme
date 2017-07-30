@@ -21,6 +21,8 @@ fn main() {
 	rules.push(Box::new(rules::PreprocessorComment::new()));
 	rules.push(Box::new(rules::MultiLinesMacro::new()));
 	rules.push(Box::new(rules::MacroName::new()));
+	rules.push(Box::new(rules::IncludePreprocessor::new()));
+	rules.push(Box::new(rules::IncludeOrder::new()));
 
 	//COMMAND LINE
 	for filename in env::args().skip(1) {

@@ -103,6 +103,8 @@ impl Rule for MultiLinesMacro {
 	}
 }
 
+
+
 pub struct MacroName {
 	
 }
@@ -142,6 +144,95 @@ impl Rule for MacroName {
 	}
 }
 
+
+//All #include directive must appear at the start of the file.
+pub struct IncludePreprocessor {
+	
+}
+
+impl IncludePreprocessor {
+	pub fn new() -> IncludePreprocessor {
+		IncludePreprocessor {  }
+	}
+}
+
+//Expect PreprocessorOnFirstColumn rule true for the given file,
+impl Rule for IncludePreprocessor {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut have_seen_code = false;
+		let mut multiline_macro = false;
+
+		for line in content.lines() {
+			if line.starts_with("#") {
+				if line.contains("\\") {
+					multiline_macro = true;
+				}
+				if line.contains("include") && have_seen_code {
+					errors.push(format!("[{}:{}]All #include directive must appear at the start of the file.", filename, line_number));
+				}
+			}
+			else
+			{
+				if !multiline_macro && line.trim().len() > 0 {
+					have_seen_code = true;
+				}
+				if multiline_macro && !line.contains("\\") {
+					multiline_macro = false;
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
+//System header must appear before local one. In header (.h) file only.
+pub struct IncludeOrder {
+	
+}
+
+impl IncludeOrder {
+	pub fn new() -> IncludeOrder {
+		IncludeOrder {  }
+	}
+}
+
+//Expect PreprocessorOnFirstColumn rule true for the given file,
+impl Rule for IncludeOrder {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		if !filename.contains(".h") {
+			return Vec::new();//Not a header.
+		}
+
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut have_seen_local_include = false;
+
+		for line in content.lines() {
+			if line.starts_with("#") && line.contains("include") {
+				if line.contains("\"") {
+					have_seen_local_include = true;
+				}
+				else if line.contains("<") && have_seen_local_include
+				{
+					errors.push(format!("[{}:{}]System headers must appear before locals one.", filename, line_number));
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
 
 #[cfg(test)]
 mod test {
@@ -198,5 +289,39 @@ mod test {
 		assert_eq!(macro_name.verify("", "#define  Name").len(), 1);
 		assert_eq!(macro_name.verify("", "#define  name_lower_Case").len(), 1);
 		assert_eq!(macro_name.verify("", "#define  zefrg(TEST ad)\\\n czdeff").len(), 1);
+	}
+
+	#[test]
+	fn include_preprocessor() {
+		let include_preprocessor = IncludePreprocessor::new();
+
+		assert_eq!(include_preprocessor.verify("", "#ifdef HELLO").len(), 0);
+		assert_eq!(include_preprocessor.verify("", "something").len(), 0);
+		assert_eq!(include_preprocessor.verify("", "# include").len(), 0);
+
+		assert_eq!(include_preprocessor.verify("", "#define something\n#include").len(), 0);
+		assert_eq!(include_preprocessor.verify("", "#define something\\\nend_of_mcro_definition\n#include").len(), 0);
+
+		assert_eq!(include_preprocessor.verify("", "code\n#  include \"no_code\"").len(), 1);
+		assert_eq!(include_preprocessor.verify("", "#include name\n code \n#include other\n").len(), 1);
+	}
+
+	#[test]
+	fn include_order() {
+		let include_order = IncludeOrder::new();
+
+		assert_eq!(include_order.verify(".h", "#ifdef HELLO").len(), 0);
+		assert_eq!(include_order.verify(".h", "# include").len(), 0);
+		assert_eq!(include_order.verify(".h", "#define SOMETHING\n# include \"header.h\"").len(), 0);
+		assert_eq!(include_order.verify(".h", "#define SOMETHING\n# include <header.h>").len(), 0);
+		assert_eq!(include_order.verify(".h", "# include <header.h>\n# include \"header.h\"").len(), 0);
+
+		assert_eq!(include_order.verify("test.h", "# include \"header.h\"\n# include <header.h>\n").len(), 1);
+		assert_eq!(include_order.verify("test.h", "# include <header.h>\n# include \"header.h\"\n# include <header.h>\n").len(), 1);
+
+		assert_eq!(include_order.verify("hello.c", "#define SOMETHING\n# include <header.h>").len(), 0);
+		assert_eq!(include_order.verify(".c", "# include <header.h>\n# include \"header.h\"").len(), 0);
+		assert_eq!(include_order.verify(".c", "# include \"header.h\"\n# include <header.h>\n").len(), 0);
+		assert_eq!(include_order.verify(".c", "# include <header.h>\n# include \"header.h\"\n# include <header.h>\n").len(), 0);
 	}
 }

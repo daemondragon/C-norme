@@ -43,7 +43,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Space instead of tab.
 - [x] No trailing whitespace.
 - [x] Closing brace must appear on the same column at the corresponding opening brace.
-- [x] The text between brace must be instented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
+- [x] The text between brace must be indented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
 - [x] All braces must be on their own line.
 
 ### Comment
@@ -57,8 +57,8 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] When macro must span over multiple lines, escape line break ('\') must be aligned.
 - [x] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
-- [ ] All #include directive must appear at the start of the file.
-- [ ] System header must appear before local one. In header (.h) file only.
+- [x] All #include directive must appear at the start of the file.
+- [x] System header must appear before local one. In header (.h) file only.
 - [ ] Headers must be protected against multiple inclusions. *See official norme for more info*.
 
 ### Functions
