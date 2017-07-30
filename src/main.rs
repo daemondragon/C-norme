@@ -24,6 +24,8 @@ fn main() {
 	rules.push(Box::new(rules::MacroName::new()));
 	rules.push(Box::new(rules::IncludePreprocessor::new()));
 	rules.push(Box::new(rules::IncludeOrder::new()));
+	rules.push(Box::new(rules::HeaderGuard::new()));
+	
 
 	//COMMAND LINE
 	for arg in env::args().skip(1) {

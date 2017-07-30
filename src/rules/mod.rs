@@ -14,7 +14,8 @@ pub use self::preprocessor::{PreprocessorOnFirstColumn,
 							 MultiLinesMacro,
 							 MacroName,
 							 IncludePreprocessor,
-							 IncludeOrder};
+							 IncludeOrder,
+							 HeaderGuard};
 
 
 pub trait Rule {

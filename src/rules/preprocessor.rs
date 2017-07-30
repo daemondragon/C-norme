@@ -234,6 +234,48 @@ impl Rule for IncludeOrder {
 	}
 }
 
+
+
+pub struct HeaderGuard {
+	
+}
+
+impl HeaderGuard {
+	pub fn new() -> HeaderGuard {
+		HeaderGuard {  }
+	}
+}
+
+//Expect PreprocessorOnFirstColumn rule true for the given file
+impl Rule for HeaderGuard {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		if !filename.contains(".h") {
+			return Vec::new();//Not a header.
+		}
+
+		let mut errors = Vec::new();
+		let header_guard = filename.split("/").last().unwrap().replace(".", "_").to_uppercase() + "_";
+
+		let first_line = String::from("#ifndef ") + &header_guard;
+		let second_line = String::from("# define ") + &header_guard;
+
+		match content.lines().nth(0) {
+			Some(line) if line == first_line => {},
+			_ => {
+				errors.push(format!("[{}:1]'{}' must appear on the first line.", filename, first_line));
+			}
+		}
+		match content.lines().nth(1) {
+			Some(line) if line == second_line => {},
+			_ => {
+				errors.push(format!("[{}:1]'{}' must appear on the second line.", filename, second_line));
+			}
+		}
+
+		return errors;
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -323,5 +365,23 @@ mod test {
 		assert_eq!(include_order.verify(".c", "# include <header.h>\n# include \"header.h\"").len(), 0);
 		assert_eq!(include_order.verify(".c", "# include \"header.h\"\n# include <header.h>\n").len(), 0);
 		assert_eq!(include_order.verify(".c", "# include <header.h>\n# include \"header.h\"\n# include <header.h>\n").len(), 0);
+	}
+
+	#[test]
+	fn header_guard() {
+		let header_guard = HeaderGuard::new();
+
+		assert_eq!(header_guard.verify("test.h", "#ifndef TEST_H_\n# define TEST_H_").len(), 0);
+		assert_eq!(header_guard.verify("../src/test.h", "#ifndef TEST_H_\n# define TEST_H_").len(), 0);
+
+		assert_eq!(header_guard.verify("test.h", "#ifndef TEST_H\n# define TEST_H\n").len(), 2);
+		assert_ne!(header_guard.verify("test.h", "# define TEST_H_").len(), 0);
+		assert_ne!(header_guard.verify("test.h", "#ifndef TEST_H_").len(), 0);
+
+		assert_eq!(header_guard.verify("test.h", "#ifndef TEST_H__\n# define TEST_H__").len(), 2);
+
+		assert_ne!(header_guard.verify("test.h", "#ifndef TEST_H_#define TEST_H_").len(), 0);
+		assert_eq!(header_guard.verify("test.h", "#ifndef TEST_H_\n\n# define TEST_H_").len(), 1);
+		assert_eq!(header_guard.verify("test.h", "#ifndef TEST_H_\n#define OTHER_H\n# define TEST_H_").len(), 1);
 	}
 }
