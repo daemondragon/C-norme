@@ -8,7 +8,8 @@ The respect of this goal mean that their must not have **ANY** false negative (N
 if a goal passe all test it respect the rule. That mean that this norme-checker is allowed to have some false positive
 (The checker detect an error when it shouldn't).
 
-Some [norme] rules might depend on more than one [checker] rule to work. 
+Some [norme] rules might depend on more than one [checker] rule to work.
+Some [checker] rules might depend on another to detect all errors.
 
 An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingstyle/codingstyle.pdf).
 *Note that this is an old norme, and new rules might have been added*
@@ -54,7 +55,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] Preprocessor directives following '#if' and '#ifdef' must be indented by one character.
 - [x] '#else' and 'endif' must be followed by a comment describing the corresponding initial condition.
 - [x] When macro must span over multiple lines, escape line break ('\') must be aligned.
-- [ ] Macro names must be entirely captitalized.
+- [x] Macro names must be entirely captitalized.
 - [ ] Macro arguments must be capitalized.
 - [ ] All #include directive must appear at the start of the file.
 - [ ] System header must appear before local one. In header (.h) file only.
