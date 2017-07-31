@@ -20,6 +20,7 @@ fn main() {
 	//misc.rs
 	rules.push(Box::new(rules::MultiLinesComment::new()));
 	rules.push(Box::new(rules::Goto::new()));
+	rules.push(Box::new(rules::Enum::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));

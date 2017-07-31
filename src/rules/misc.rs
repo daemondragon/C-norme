@@ -63,6 +63,7 @@ impl Rule for MultiLinesComment {
 
 
 pub struct Goto {
+
 }
 
 impl Goto {
@@ -79,6 +80,51 @@ impl Rule for Goto {
 		for line in content.lines() {
 			if line.contains("goto") {
 				errors.push(format!("[{}:{}]Goto statement unauthorized.", filename, line_number));
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
+pub struct Enum {
+	
+}
+
+impl Enum {
+	pub fn new() -> Enum {
+		Enum { }
+	}
+}
+
+impl Rule for Enum {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut in_enum = false;
+
+		for line in content.lines() {
+			if in_enum {
+				if line.contains("}") {
+					in_enum = false;
+				}
+				if line.to_uppercase() != line {
+					errors.push(format!("[{}:{}]Enum values must be entirely capitalized.", filename, line_number));
+				}
+				if line.contains(",") &&
+					line.trim().len() > 1 &&//To prevent having only a comma on a line.
+					!line.split(",").last().unwrap().trim().is_empty() {
+					errors.push(format!("[{}:{}]Enum values must be on their own line.", filename, line_number));
+				}
+			}
+
+			if line.contains("enum") {
+				in_enum = true;
 			}
 
 			line_number += 1;
@@ -115,5 +161,20 @@ mod test {
 		assert_eq!(goto.verify("", "go\nto\ngo\nto\n").len(), 0);
 		assert_eq!(goto.verify("", "goto").len(), 1);
 		assert_eq!(goto.verify("", "goto\nadezf\nvvrgotoded").len(), 2);
+	}
+
+	#[test]
+	fn enum_rule() {
+		let enum_rule = Enum::new();
+
+		assert_eq!(enum_rule.verify("", "enum{}").len(), 0);
+		assert_eq!(enum_rule.verify("", "enum\n{\n}A").len(), 0);
+
+		assert_eq!(enum_rule.verify("", "enum\n{\nVALUE\n}").len(), 0);
+		assert_eq!(enum_rule.verify("", "enum\n{\nVALUE, \t\nVALUE2\n}").len(), 0);
+
+		assert_eq!(enum_rule.verify("", "enum\n{\nvalue\n}").len(), 1);
+		assert_eq!(enum_rule.verify("", "enum\n{\nValue\n}").len(), 1);
+		assert_eq!(enum_rule.verify("", "enum\n{\nVALUE,VALUE2\n}").len(), 1);
 	}
 }

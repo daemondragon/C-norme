@@ -64,14 +64,16 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 
 ### Functions
 - [x] Function's body must not contain more than 25 lines (excluding comments and blank line).
-- [ ] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
+- [x] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
 - [x] Function must not have more than four arguments.
 - [ ] There must be at most five exported functions per source file.
 - [ ] There must be at most ten function per source file.
+- [ ] Function prototype must only be located in header (.h) file.
+- [ ] If function arguments are split over multiple lines, they must be aligned.
 
 ### Enumeration
-- [ ] Enumerations values must be entirely capitalized.
-- [ ] Enumerations values must appear on their own line.
+- [x] Enumerations values must be entirely capitalized.
+- [x] Enumerations values must appear on their own line.
 
 ### Naming convention
 - [ ] Global variables must start with 'g_'.
