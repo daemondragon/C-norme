@@ -18,6 +18,7 @@ impl Rule for FunctionMaxCodeLines {
 
 		let mut indentation = 0;
 		let mut nb_code_lines = 0;
+		let mut in_multi_line_comment = false;
 
 		for line in content.lines() {
 			if line.contains("}") {
@@ -28,9 +29,22 @@ impl Rule for FunctionMaxCodeLines {
 			}
 
 			if indentation >= 1 {
-				if !line.trim().is_empty() && !line.trim_left().starts_with("//") {
+				let mut dont_have_code = line.trim().is_empty() || line.trim_left().starts_with("//") || in_multi_line_comment; 
+				if line.contains("/*") {
+					in_multi_line_comment = true;
+					dont_have_code = line.trim_left().starts_with("/*");
+				}
+
+				if line.contains("*/") && dont_have_code {
+					in_multi_line_comment = false;
+					dont_have_code = line.trim_right().ends_with("*/");
+				}
+
+				if !dont_have_code {
 					nb_code_lines += 1;
 				}
+
+				
 			}
 
 			if line.contains("{") {
@@ -81,15 +95,17 @@ impl Rule for FunctionMaxArguments {
 			}
 
 			if in_arguments {
-				line = line.split(")").next().unwrap();
-
-				nb_arguments += line.split(",").count();
-
 				if line.contains(")") {
 					in_arguments = false;
+
+					line = line.split(")").next().unwrap();
+					nb_arguments += line.chars().filter(|c| *c == ',').count() + 1;// n ',' lead to n+1 arguments
 					if nb_arguments > self.max_nb_arguments {
 						errors.push(format!("[{}:{}]Too many function arguments. Expected at most {} got {}", filename, line_number, self.max_nb_arguments, nb_arguments));
 					}
+				}
+				else {
+					nb_arguments += line.chars().filter(|c| *c == ',').count();
 				}
 			}
 
@@ -98,5 +114,42 @@ impl Rule for FunctionMaxArguments {
 
 
 		return errors;
+	}
+}
+
+
+#[cfg(test)]
+mod test {
+	use super::*;
+	#[test]
+	fn function_max_code_lines() {
+		let function_max_code_lines = FunctionMaxCodeLines::new(1);
+
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\n}").len(), 0);
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\n\n\n}").len(), 0);
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\ncode;\n\n}").len(), 0);
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\ncode;\n//comment\n}").len(), 0);
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\ncode;\n/*comment*/\n}").len(), 0);
+		assert_eq!(function_max_code_lines.verify("", "something()\n{\ncode;\n/*\ncomment\n*/\n}").len(), 0);
+
+		assert_ne!(function_max_code_lines.verify("", "something()\n{\ncode;\ncode;\n}").len(), 0);
+		assert_ne!(function_max_code_lines.verify("", "something()\n{\ncode;\n//comment\ncode;\n}").len(), 0);
+		assert_ne!(function_max_code_lines.verify("", "something()\n{\ncode;\ncode;//comment\n}").len(), 0);
+		assert_ne!(function_max_code_lines.verify("", "something()\n{\ncode;\ncode/*\ncomment*/\n}").len(), 0);
+		assert_ne!(function_max_code_lines.verify("", "something()\n{\ncode;\n/*\ncomment*/code;\n}").len(), 0);
+	}
+
+	#[test]
+	fn function_max_arguments() {
+		let function_max_arguments = FunctionMaxArguments::new(1);
+
+		assert_eq!(function_max_arguments.verify("", "something()\n{\n}").len(), 0);
+		assert_eq!(function_max_arguments.verify("", "something(int test)\n{\n}").len(), 0);
+		assert_eq!(function_max_arguments.verify("", "something(struct test temp)\n{\n}").len(), 0);
+		
+		assert_eq!(function_max_arguments.verify("", "something(struct test temp, int testv2)\n{\n}").len(), 1);
+		assert_eq!(function_max_arguments.verify("", "something(struct test temp, int testv2, int v4)\n{\n}").len(), 1);
+		assert_eq!(function_max_arguments.verify("", "something(struct test temp,\nint testv2)\n{\n}").len(), 1);
+		assert_eq!(function_max_arguments.verify("", "something(\nstruct test temp,\nint testv2\n)\n{\n}").len(), 1);
 	}
 }

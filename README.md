@@ -63,9 +63,9 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Headers must be protected against multiple inclusions. *See official norme for more info*.
 
 ### Functions
-- [ ] Function's body must not contain more than 25 lines (excluding comments and blank line).
+- [x] Function's body must not contain more than 25 lines (excluding comments and blank line).
 - [ ] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
-- [ ] Function must not have more than four arguments.
+- [x] Function must not have more than four arguments.
 - [ ] There must be at most five exported functions per source file.
 - [ ] There must be at most ten function per source file.
 
