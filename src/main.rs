@@ -17,8 +17,9 @@ fn main() {
 	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::IndentationLevel::new(4)));
 
-	//comment.rs
+	//misc.rs
 	rules.push(Box::new(rules::MultiLinesComment::new()));
+	rules.push(Box::new(rules::Goto::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
@@ -31,9 +32,13 @@ fn main() {
 	rules.push(Box::new(rules::IncludeOrder::new()));
 	rules.push(Box::new(rules::HeaderGuard::new()));
 
+	//function.rs
+	rules.push(Box::new(rules::FunctionMaxCodeLines::new(25)));
+	rules.push(Box::new(rules::FunctionMaxArguments::new(4)));
+
+
 	for arg in env::args().skip(1) {
 		verify_file_or_directory(&rules, &arg);
-		
 	}
 }
 
@@ -49,7 +54,7 @@ fn verify_file_or_directory(rules: &Vec<Box<Rule>>, pathname: &str)
         		verify_file_or_directory(&rules, entry.path().to_str().unwrap());
     		}
 		}
-	} 
+	}
 }
 
 fn verify_file(rules: &Vec<Box<Rule>>, filename: &str)

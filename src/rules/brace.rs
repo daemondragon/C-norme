@@ -62,7 +62,7 @@ impl Rule for IndentationLevel {
 			}
 
 			//Test of indentation
-			if line.trim().len() > 0 {
+			if !line.trim().is_empty() {
 				let current_indentation = line.len() - line.trim_left().len();
 				if current_indentation != indentation_level * self.nb_spaces {
 					errors.push(format!("[{}:{}]Wrong indentation level. Expected {} whitespaces got {}",

@@ -45,6 +45,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Closing brace must appear on the same column at the corresponding opening brace.
 - [x] The text between brace must be indented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
 - [x] All braces must be on their own line.
+- [x] The goto statement must not be used.
 
 ### Comment
 - [x] Multiline comments delimiters must appear on their on line.

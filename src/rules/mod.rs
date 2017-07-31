@@ -1,23 +1,14 @@
 pub mod space;
 pub mod brace;
-pub mod comment;
+pub mod misc;
 pub mod preprocessor;
+pub mod function;
 
-pub use self::space::{LineSize,
-					  SpaceIndentation,
-					  TrailingWhiteSpace};
-pub use self::brace::{OwnLineBrace,
-					  IndentationLevel};
-pub use self::comment::{MultiLinesComment};
-pub use self::preprocessor::{PreprocessorOnFirstColumn,
-							 PreprocessorIndentation,
-							 PreprocessorComment,
-							 MultiLinesMacro,
-							 MacroName,
-							 MacroArguments,
-							 IncludePreprocessor,
-							 IncludeOrder,
-							 HeaderGuard};
+pub use self::space::*;
+pub use self::brace::*;
+pub use self::misc::*;
+pub use self::preprocessor::*;
+pub use self::function::*;
 
 
 pub trait Rule {

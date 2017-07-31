@@ -60,6 +60,34 @@ impl Rule for MultiLinesComment {
 	}
 }
 
+
+
+pub struct Goto {
+}
+
+impl Goto {
+	pub fn new() -> Goto {
+		Goto { }
+	}
+}
+
+impl Rule for Goto {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		for line in content.lines() {
+			if line.contains("goto") {
+				errors.push(format!("[{}:{}]Goto statement unauthorized.", filename, line_number));
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -77,5 +105,15 @@ mod test {
 		assert_ne!(multi_lines_comment.verify("", "/*\nav**zdnkcn\n*/").len(), 0);
 		assert_ne!(multi_lines_comment.verify("", "/** *\n**zdnkcn\n*/").len(), 0);
 		assert_ne!(multi_lines_comment.verify("", "/**\n**zdnkcn\n*/*").len(), 0);
+	}
+
+	#[test]
+	fn goto() {
+		let goto = Goto::new();
+
+		assert_eq!(goto.verify("", "zdnkcndccc").len(), 0);
+		assert_eq!(goto.verify("", "go\nto\ngo\nto\n").len(), 0);
+		assert_eq!(goto.verify("", "goto").len(), 1);
+		assert_eq!(goto.verify("", "goto\nadezf\nvvrgotoded").len(), 2);
 	}
 }
