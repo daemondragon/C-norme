@@ -118,6 +118,62 @@ impl Rule for FunctionMaxArguments {
 }
 
 
+
+pub struct FunctionBlankLines {
+}
+
+impl FunctionBlankLines {
+	pub fn new() -> FunctionBlankLines {
+		FunctionBlankLines { }
+	}
+}
+
+impl Rule for FunctionBlankLines {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut indentation = 0;
+		let mut is_previous_blank = false;
+		let mut in_multi_line_comment = false;
+
+		for line in content.lines() {
+			indentation += line.chars().filter(|x| *x == '{').count();
+			indentation -= line.chars().filter(|x| *x == '}').count();
+
+			if indentation > 0 {
+				if line.trim().is_empty() && !in_multi_line_comment {
+					if is_previous_blank {
+						errors.push(format!("[{}:{}]Two following blank line found.", filename, line_number));
+					}
+					is_previous_blank = true;
+				}
+				else
+				{
+					let mut dont_have_code = line.trim_left().starts_with("//") || in_multi_line_comment ; 
+					if line.contains("/*") {
+						in_multi_line_comment = true;
+						dont_have_code = line.trim_left().starts_with("/*");
+					}
+
+					if line.contains("*/") && dont_have_code {
+						in_multi_line_comment = false;
+						dont_have_code = line.trim_right().ends_with("*/");
+					}
+
+					is_previous_blank = dont_have_code && is_previous_blank;
+				}
+			}
+
+			line_number += 1;
+		}
+
+
+		return errors;
+	}
+}
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -151,5 +207,21 @@ mod test {
 		assert_eq!(function_max_arguments.verify("", "something(struct test temp, int testv2, int v4)\n{\n}").len(), 1);
 		assert_eq!(function_max_arguments.verify("", "something(struct test temp,\nint testv2)\n{\n}").len(), 1);
 		assert_eq!(function_max_arguments.verify("", "something(\nstruct test temp,\nint testv2\n)\n{\n}").len(), 1);
+	}
+
+	#[test]
+	fn function_blank_lines() {
+		let function_blank_lines = FunctionBlankLines::new();
+
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n}").len(), 0);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n}").len(), 0);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n//comment\n//comment\n}").len(), 0);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\ncode\n\n}").len(), 0);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n/*comment\n*/\n\n}").len(), 0);
+
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n\n}").len(), 1);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n//comment\n\n}").len(), 1);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n/*\ncomment\n*/\n\n}").len(), 1);
+		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n/*next line is a comment\n\n*/\n\n}").len(), 1);
 	}
 }

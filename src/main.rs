@@ -35,6 +35,7 @@ fn main() {
 	//function.rs
 	rules.push(Box::new(rules::FunctionMaxCodeLines::new(25)));
 	rules.push(Box::new(rules::FunctionMaxArguments::new(4)));
+	rules.push(Box::new(rules::FunctionBlankLines::new()));
 
 
 	for arg in env::args().skip(1) {
