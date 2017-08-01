@@ -180,6 +180,34 @@ impl Rule for Semicolon {
 
 
 
+pub struct StaticVariable {
+	
+}
+
+impl StaticVariable {
+	pub fn new() -> StaticVariable {
+		StaticVariable { }
+	}
+}
+
+impl Rule for StaticVariable {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		for line in content.lines() {
+			if line.contains("static") && !line.contains("static const") {
+				errors.push(format!("[{}:{}]Static variable must be const.", filename, line_number));
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -237,5 +265,16 @@ mod test {
 		assert_ne!(semicolon.verify("", "return ;").len(), 0);
 		assert_ne!(semicolon.verify("", ";;;").len(), 0);
 		assert_ne!(semicolon.verify("", ";\t").len(), 0);
+	}
+
+	#[test]
+	fn static_variable() {
+		let static_variable = StaticVariable::new();
+
+		assert_eq!(static_variable.verify("", "something;").len(), 0);
+		assert_eq!(static_variable.verify("", "const something;").len(), 0);
+		assert_eq!(static_variable.verify("", "static const something;").len(), 0);
+
+		assert_eq!(static_variable.verify("", "static something;").len(), 1);
 	}
 }

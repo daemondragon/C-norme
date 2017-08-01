@@ -43,7 +43,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] No trailing whitespace.
 - [x] All braces must be on their own line.
 - [x] The goto statement must not be used.
-- [ ] Static variables must be constant.
+- [x] Static variables must be constant.
 - [ ] Global variables must start with 'g_'.
 - [ ] The pointer symbol '*' must appear next to the variable name, not the type.
 - [ ] One declaration per line (in function, structure, enum or union).

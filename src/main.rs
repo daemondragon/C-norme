@@ -22,6 +22,7 @@ fn main() {
 	rules.push(Box::new(rules::Goto::new()));
 	rules.push(Box::new(rules::Enum::new()));
 	rules.push(Box::new(rules::Semicolon::new()));
+	rules.push(Box::new(rules::StaticVariable::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
