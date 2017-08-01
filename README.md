@@ -40,12 +40,23 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 
 ### Global
 - [x] No more than 80 characters per line (including newline character).
-- [x] Space instead of tab.
 - [x] No trailing whitespace.
-- [x] Closing brace must appear on the same column at the corresponding opening brace.
-- [x] The text between brace must be indented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
 - [x] All braces must be on their own line.
 - [x] The goto statement must not be used.
+- [ ] Static variables must be constant.
+- [ ] Global variables must start with 'g_'.
+- [ ] The pointer symbol '*' must appear next to the variable name, not the type.
+- [ ] One declaration per line (in function, structure, enum or union).
+- [ ] One statement per line.
+
+### Indentation
+- [x] Space instead of tab.
+- [x] The text between brace must be indented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
+- [x] Closing brace must appear on the same column at the corresponding opening brace.
+- [x] Semicolon must be followed by a newline and must not be preceded by a whitespace, except if alone on a line.
+- [ ] Comma must be followed by a single space, except if it's the last non white character of the line.
+- [ ] All binary and ternary operator must be padded on the left and right by one space, including assignement operator.
+- [ ] Structure, enum and union fields must be aligned with the type name.
 
 ### Comment
 - [x] Multiline comments delimiters must appear on their on line.
@@ -70,18 +81,17 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] There must be at most ten function per source file.
 - [ ] Function prototype must only be located in header (.h) file.
 - [ ] If function arguments are split over multiple lines, they must be aligned.
+- [x] No whitespace between function and the opening parenthesis.
 
 ### Enumeration
 - [x] Enumerations values must be entirely capitalized.
 - [x] Enumerations values must appear on their own line.
 
-### Naming convention
-- [ ] Global variables must start with 'g_'.
-
 ### Typedef
 - [ ] Structures names must be prefixed by 's_'.
 - [ ] Unions names must be prefixed by 'u_'.
 - [ ] Enumerations names must be prefixed by 'e_'.
+- [ ] Basic type aliasing must start with 't_'. 't_' alone are prohibited.
 - [ ] If the type already have 'e_', 'f_', 's_', 't_', 'u_' as prefix, it has to be keep.
 
 More rules to be added later...

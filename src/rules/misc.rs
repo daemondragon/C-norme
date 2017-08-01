@@ -134,6 +134,52 @@ impl Rule for Enum {
 	}
 }
 
+pub struct Semicolon {
+	
+}
+
+impl Semicolon {
+	pub fn new() -> Semicolon {
+		Semicolon { }
+	}
+}
+
+impl Rule for Semicolon {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		for line in content.lines() {
+			match line.chars().filter(|x| *x == ';').count() {
+				n if n == 1 => {
+					if line.chars().last().unwrap() != ';' {
+						errors.push(format!("[{}:{}]Semicolon must be followed by a newline.", filename, line_number));
+					}
+					else {
+						let left_part = line.split(";").next().unwrap();
+						if !left_part.trim_right().is_empty() &&
+							left_part.trim_right().len() != left_part.len() {
+							errors.push(format!("[{}:{}]Semicolon must not be precedeed by whitespaces.", filename, line_number));
+						}
+					}
+				},
+				n if n >= 2 => {
+					if !line.contains("for") || n > 2 {
+						errors.push(format!("[{}:{}]Too much semicolon found on this line.", filename, line_number));
+					}
+				},
+				_ => {}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -176,5 +222,20 @@ mod test {
 		assert_eq!(enum_rule.verify("", "enum\n{\nvalue\n}").len(), 1);
 		assert_eq!(enum_rule.verify("", "enum\n{\nValue\n}").len(), 1);
 		assert_eq!(enum_rule.verify("", "enum\n{\nVALUE,VALUE2\n}").len(), 1);
+	}
+
+	#[test]
+	fn semicolon() {
+		let semicolon = Semicolon::new();
+
+		assert_eq!(semicolon.verify("", ";").len(), 0);
+		assert_eq!(semicolon.verify("", "something;").len(), 0);
+		assert_eq!(semicolon.verify("", "	;").len(), 0);
+		assert_eq!(semicolon.verify("", "for ( ; ;)").len(), 0);
+
+		assert_ne!(semicolon.verify("", "for (;;);").len(), 0);
+		assert_ne!(semicolon.verify("", "return ;").len(), 0);
+		assert_ne!(semicolon.verify("", ";;;").len(), 0);
+		assert_ne!(semicolon.verify("", ";\t").len(), 0);
 	}
 }

@@ -21,6 +21,7 @@ fn main() {
 	rules.push(Box::new(rules::MultiLinesComment::new()));
 	rules.push(Box::new(rules::Goto::new()));
 	rules.push(Box::new(rules::Enum::new()));
+	rules.push(Box::new(rules::Semicolon::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
@@ -37,6 +38,7 @@ fn main() {
 	rules.push(Box::new(rules::FunctionMaxCodeLines::new(25)));
 	rules.push(Box::new(rules::FunctionMaxArguments::new(4)));
 	rules.push(Box::new(rules::FunctionBlankLines::new()));
+	rules.push(Box::new(rules::FunctionStartParenthesis::new()));	
 
 
 	for arg in env::args().skip(1) {

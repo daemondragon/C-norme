@@ -375,7 +375,7 @@ impl Rule for HeaderGuard {
 		match content.lines().nth(1) {
 			Some(line) if line == second_line => {},
 			_ => {
-				errors.push(format!("[{}:1]'{}' must appear on the second line.", filename, second_line));
+				errors.push(format!("[{}:2]'{}' must appear on the second line.", filename, second_line));
 			}
 		}
 

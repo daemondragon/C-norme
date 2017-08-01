@@ -24,7 +24,7 @@ impl Rule for FunctionMaxCodeLines {
 			if line.contains("}") {
 				indentation -= 1;
 				if indentation == 0 && nb_code_lines > self.max_lines {
-					errors.push(format!("[{}:{}]Function body's line count excedeed. Expected at most {} got {}", filename, line_number, self.max_lines, nb_code_lines));
+					errors.push(format!("[{}:{}]Function body's line count excedeed. Expected at most {} got {}.", filename, line_number, self.max_lines, nb_code_lines));
 				}
 			}
 
@@ -101,7 +101,7 @@ impl Rule for FunctionMaxArguments {
 					line = line.split(")").next().unwrap();
 					nb_arguments += line.chars().filter(|c| *c == ',').count() + 1;// n ',' lead to n+1 arguments
 					if nb_arguments > self.max_nb_arguments {
-						errors.push(format!("[{}:{}]Too many function arguments. Expected at most {} got {}", filename, line_number, self.max_nb_arguments, nb_arguments));
+						errors.push(format!("[{}:{}]Too many function arguments. Expected at most {} got {}.", filename, line_number, self.max_nb_arguments, nb_arguments));
 					}
 				}
 				else {
@@ -174,6 +174,48 @@ impl Rule for FunctionBlankLines {
 }
 
 
+
+pub struct FunctionStartParenthesis {
+
+}
+
+impl FunctionStartParenthesis {
+	pub fn new() -> FunctionStartParenthesis {
+		FunctionStartParenthesis { }
+	}
+}
+
+impl Rule for FunctionStartParenthesis {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut indentation = 0;
+		
+		for line in content.lines() {
+			indentation += line.chars().filter(|x| *x == '{').count();
+			indentation -= line.chars().filter(|x| *x == '}').count();
+			
+			if indentation == 0 {
+				match line.chars().position(|x| x == '(') {
+					Some(p) if p > 0 => {
+						if line.chars().nth(p - 1).unwrap().is_whitespace() {
+							errors.push(format!("[{}:{}]Function parenthesis must be next to function name.", filename, line_number));
+						}
+					},
+					_ => (),
+				}
+			}
+
+			line_number += 1;
+		}
+
+
+		return errors;
+	}
+}
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -223,5 +265,18 @@ mod test {
 		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n//comment\n\n}").len(), 1);
 		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n/*\ncomment\n*/\n\n}").len(), 1);
 		assert_eq!(function_blank_lines.verify("", "f()\n{\n\n/*next line is a comment\n\n*/\n\n}").len(), 1);
+	}
+
+	#[test]
+	fn function_start_parenthesis() {
+		let function_start_parenthesis = FunctionStartParenthesis::new();
+
+		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n}").len(), 0);
+		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n (\n}").len(), 0);
+		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n\t(\n}").len(), 0);
+
+		assert_eq!(function_start_parenthesis.verify("", "f ()\n{\n\n}").len(), 1);
+		assert_eq!(function_start_parenthesis.verify("", "f   ()\n{\n\n}").len(), 1);
+		assert_eq!(function_start_parenthesis.verify("", "f\t()\n{\n\n}").len(), 1);
 	}
 }
