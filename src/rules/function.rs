@@ -216,6 +216,43 @@ impl Rule for FunctionStartParenthesis {
 }
 
 
+
+pub struct MaxFunctionsPerSourceFile {
+	max_functions: usize
+}
+
+impl MaxFunctionsPerSourceFile {
+	pub fn new(max_functions_per_source_file: usize) -> MaxFunctionsPerSourceFile {
+		MaxFunctionsPerSourceFile { max_functions: max_functions_per_source_file }
+	}
+}
+
+//This rule expect OwnLineBrace and IndentationLevel rule to be true
+impl Rule for MaxFunctionsPerSourceFile {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		if !filename.contains(".c") {
+			return Vec::new();
+		}
+
+		let mut errors = Vec::new();
+		let mut nb_functions: usize = 0;
+		
+		for line in content.lines() {			
+			if line.starts_with("{") {
+				nb_functions += 1;
+			}
+		}
+
+		if nb_functions > self.max_functions {
+			errors.push(format!("[{}]Too much functions found. Expected at most {} functions, got {}.", filename, self.max_functions, nb_functions));
+		}
+
+
+		return errors;
+	}
+}
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -278,5 +315,19 @@ mod test {
 		assert_eq!(function_start_parenthesis.verify("", "f ()\n{\n\n}").len(), 1);
 		assert_eq!(function_start_parenthesis.verify("", "f   ()\n{\n\n}").len(), 1);
 		assert_eq!(function_start_parenthesis.verify("", "f\t()\n{\n\n}").len(), 1);
+	}
+
+	#[test]
+	fn max_functions_per_source_file() {
+		let max_functions_per_source_file = MaxFunctionsPerSourceFile::new(1);
+
+		assert_eq!(max_functions_per_source_file.verify(".c", "something();").len(), 0);
+		assert_eq!(max_functions_per_source_file.verify(".c", "f()\n{\n\n}").len(), 0);
+		assert_eq!(max_functions_per_source_file.verify(".c", "f ()\n{\n {\n }\n}").len(), 0);
+
+		assert_eq!(max_functions_per_source_file.verify(".c", "{\n}\n{\n}").len(), 1);
+		assert_eq!(max_functions_per_source_file.verify(".c", "{\n}\n{\n}\n{\n}").len(), 1);
+		assert_eq!(max_functions_per_source_file.verify(".h", "f()\n{\n}\ng()\n{\n}").len(), 0);
+		assert_eq!(max_functions_per_source_file.verify(".h", "f ()\n{\n {\n }\n}").len(), 0);
 	}
 }

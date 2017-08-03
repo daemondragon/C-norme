@@ -5,7 +5,7 @@ The non respect of this will result with a 0 mark, so having an automated tool t
 is really useful.
 
 The respect of this goal mean that their must not have **ANY** false negative (No errors were found where it should have):
-if a goal passe all test it respect the rule. That mean that this norme-checker is allowed to have some false positive
+if a goal passe all test then it **RESPECT** the rule. That mean that this norme-checker is allowed to have some false positive
 (The checker detect an error when it shouldn't).
 
 Some [norme] rules might depend on more than one [checker] rule to work.
@@ -54,7 +54,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] The text between brace must be indented by 4 spaces (could be 2, but 4 is choosen for personnal preference).
 - [x] Closing brace must appear on the same column at the corresponding opening brace.
 - [x] Semicolon must be followed by a newline and must not be preceded by a whitespace, except if alone on a line.
-- [ ] Comma must be followed by a single space, except if it's the last non white character of the line.
+- [x] Comma must be followed by a single space, except if it's the last non white character of the line (and not precedeed by whitespaces).
 - [ ] All binary and ternary operator must be padded on the left and right by one space, including assignement operator.
 - [ ] Structure, enum and union fields must be aligned with the type name.
 
@@ -78,7 +78,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
 - [x] Function must not have more than four arguments.
 - [ ] There must be at most five exported functions per source file.
-- [ ] There must be at most ten function per source file.
+- [x] There must be at most ten function per source file.
 - [ ] Function prototype must only be located in header (.h) file.
 - [ ] If function arguments are split over multiple lines, they must be aligned.
 - [x] No whitespace between function and the opening parenthesis.

@@ -12,6 +12,7 @@ fn main() {
 	rules.push(Box::new(rules::LineSize::new(80)));
 	rules.push(Box::new(rules::SpaceIndentation::new()));
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
+	rules.push(Box::new(rules::Comma::new()));
 
 	//brace.rs
 	rules.push(Box::new(rules::OwnLineBrace::new()));
@@ -39,7 +40,8 @@ fn main() {
 	rules.push(Box::new(rules::FunctionMaxCodeLines::new(25)));
 	rules.push(Box::new(rules::FunctionMaxArguments::new(4)));
 	rules.push(Box::new(rules::FunctionBlankLines::new()));
-	rules.push(Box::new(rules::FunctionStartParenthesis::new()));	
+	rules.push(Box::new(rules::FunctionStartParenthesis::new()));
+	rules.push(Box::new(rules::MaxFunctionsPerSourceFile::new(10)));	
 
 
 	for arg in env::args().skip(1) {
