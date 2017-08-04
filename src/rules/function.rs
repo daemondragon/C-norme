@@ -84,8 +84,12 @@ impl Rule for FunctionMaxArguments {
 		let mut nb_arguments = 0;
 
 		for line in content.lines() {
-			indentation += line.chars().filter(|x| *x == '{').count();
-			indentation -= line.chars().filter(|x| *x == '}').count();
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0{
+				indentation -= 1;
+			}
 
 			let mut line = line;
 			if indentation == 0 && line.contains("(") {
@@ -138,8 +142,12 @@ impl Rule for FunctionBlankLines {
 		let mut in_multi_line_comment = false;
 
 		for line in content.lines() {
-			indentation += line.chars().filter(|x| *x == '{').count();
-			indentation -= line.chars().filter(|x| *x == '}').count();
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0{
+				indentation -= 1;
+			}
 
 			if indentation > 0 {
 				if line.trim().is_empty() && !in_multi_line_comment {
@@ -193,8 +201,12 @@ impl Rule for FunctionStartParenthesis {
 		let mut indentation = 0;
 		
 		for line in content.lines() {
-			indentation += line.chars().filter(|x| *x == '{').count();
-			indentation -= line.chars().filter(|x| *x == '}').count();
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0{
+				indentation -= 1;
+			}
 			
 			if indentation == 0 {
 				match line.chars().position(|x| x == '(') {
@@ -311,8 +323,12 @@ impl Rule for FunctionParametersIndentation {
 		let mut parameters_indentation = 0;
 
 		for line in content.lines() {
-			indentation += line.chars().filter(|x| *x == '{').count();
-			indentation -= line.chars().filter(|x| *x == '}').count();
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0{
+				indentation -= 1;
+			}
 
 			if indentation <= 0 {
 				if line.contains("(") {
