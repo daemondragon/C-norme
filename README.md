@@ -77,10 +77,10 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Function's body must not contain more than 25 lines (excluding comments and blank line).
 - [x] Function's subpart have to be separated one blank line maximum (No two following blank line, excluding comments).
 - [x] Function must not have more than four arguments.
-- [ ] There must be at most five exported functions per source file.
+- [x] There must be at most five exported functions per source file.
 - [x] There must be at most ten function per source file.
-- [ ] Function prototype must only be located in header (.h) file.
-- [ ] If function arguments are split over multiple lines, they must be aligned.
+- [x] Function prototype must only be located in header (.h) file.
+- [x] If function arguments are split over multiple lines, they must be aligned.
 - [x] No whitespace between function and the opening parenthesis.
 
 ### Enumeration

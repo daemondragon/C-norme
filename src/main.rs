@@ -41,8 +41,10 @@ fn main() {
 	rules.push(Box::new(rules::FunctionMaxArguments::new(4)));
 	rules.push(Box::new(rules::FunctionBlankLines::new()));
 	rules.push(Box::new(rules::FunctionStartParenthesis::new()));
-	rules.push(Box::new(rules::MaxFunctionsPerSourceFile::new(10)));	
-
+	rules.push(Box::new(rules::MaxFunctionsPerSourceFile::new(10)));
+	rules.push(Box::new(rules::MaxExportedFunctions::new(5)));
+	rules.push(Box::new(rules::FunctionParametersIndentation::new()));
+	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));
 
 	for arg in env::args().skip(1) {
 		verify_file_or_directory(&rules, &arg);
