@@ -46,35 +46,35 @@ fn main() {
 	rules.push(Box::new(rules::FunctionParametersIndentation::new()));
 	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));
 
-	let mut files: Vec<String> = Vec::new();
+	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
-		add_file_or_directory(&mut files, &arg);
+		add_file_or_directory(&mut filenames, &arg);
 	}
 
-	verify(&rules, &files);
+	verify(&rules, &filenames);
 }
 
-fn add_file_or_directory(mut files: &mut Vec<String>, pathname: &str)
+fn add_file_or_directory(mut filenames: &mut Vec<String>, pathname: &str)
 {
 	let path = Path::new(pathname);
 	if path.is_file() {
-		files.push(String::from(pathname));
+		filenames.push(String::from(pathname));
 	}
 	else if path.is_dir() {
-		for entry in path.read_dir().expect("something went wrong opening a directory.") {
+		for entry in path.read_dir().expect(&format!("Something went wrong opening {}", pathname)) {
     		if let Ok(entry) = entry {
-        		add_file_or_directory(&mut files, entry.path().to_str().unwrap());
+        		add_file_or_directory(&mut filenames, entry.path().to_str().unwrap());
     		}
 		}
 	}
 }
 
-fn verify(rules: &Vec<Box<Rule>>, files: &Vec<String>)
+fn verify(rules: &Vec<Box<Rule>>, filenames: &Vec<String>)
 {
-	for filename in files {
+	for filename in filenames {
 		let mut file = File::open(&filename).expect("file not found");
 		let mut content = String::new();
-		file.read_to_string(&mut content).expect("something went wrong reading the file");
+		file.read_to_string(&mut content).expect(&format!("Something went wrong reading {}", filename));
 
 		for rule in rules.iter() {
 			for error in rule.verify(&filename, &content).iter() {

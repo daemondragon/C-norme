@@ -48,6 +48,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] The pointer symbol '*' must appear next to the variable name, not the type.
 - [ ] One declaration per line (in function, structure, enum or union).
 - [ ] One statement per line.
+- [x] Function, variable and file names must be in lowercase.
 
 ### Indentation
 - [x] Space instead of tab.

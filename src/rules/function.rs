@@ -287,7 +287,7 @@ impl Rule for MaxExportedFunctions {
 		let mut nb_functions: usize = 0;
 		
 		for line in content.lines() {			
-			if line.contains("(") && !line.starts_with("#"){
+			if line.contains("(") && !line.starts_with("#") && !line.ends_with("\\"){
 				nb_functions += 1;
 			}
 		}
