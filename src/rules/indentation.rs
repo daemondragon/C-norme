@@ -106,6 +106,10 @@ impl Rule for Semicolon {
 		for line in content.lines() {
 			match line.chars().filter(|x| *x == ';').count() {
 				n if n == 1 => {
+					if line.contains("while") {
+						errors.push(format!("[{}:{}]Too much semicolon found on this line.", filename, line_number));
+					}
+
 					if line.chars().last().unwrap() != ';' {
 						errors.push(format!("[{}:{}]Semicolon must be followed by a newline.", filename, line_number));
 					}
@@ -177,6 +181,38 @@ impl Rule for Comma {
 }
 
 
+
+pub struct ControlStructures {
+	
+}
+
+impl ControlStructures {
+	pub fn new() -> ControlStructures {
+		ControlStructures { }
+	}
+}
+
+impl Rule for ControlStructures {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		for line in content.lines() {
+			for element in ["if", "for", "while", "switch"].iter() {
+				if line.contains(element) && !line.contains(&(String::from(*element) + " (")) {
+					errors.push(format!("[{}:{}]{} must be followed by ' ('.", filename, line_number, element));
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -245,5 +281,28 @@ mod test {
 		assert_ne!(comma.verify("", "comma ,comma ,comma").len(), 0);
 		assert_ne!(comma.verify("", "comma , comma , comma").len(), 0);
 		assert_ne!(comma.verify("", "comma,comma,comma").len(), 0);
+	}
+
+	#[test]
+	fn control_structures()
+	{
+		let control_structures = ControlStructures::new();
+
+		assert_eq!(control_structures.verify("", "something,\nother").len(), 0);
+		assert_eq!(control_structures.verify("", "if (condition)").len(), 0);
+		assert_eq!(control_structures.verify("", "while (condition)").len(), 0);
+		assert_eq!(control_structures.verify("", "switch (condition)").len(), 0);
+		assert_eq!(control_structures.verify("", "else if (condition)").len(), 0);
+		assert_eq!(control_structures.verify("", "for (i = 0; i < n; ++i)").len(), 0);
+
+		assert_eq!(control_structures.verify("", "if(condition)").len(), 1);
+		assert_eq!(control_structures.verify("", "while(condition)").len(), 1);
+		assert_eq!(control_structures.verify("", "switch(condition)").len(), 1);
+		assert_eq!(control_structures.verify("", "else if(condition)").len(), 1);
+		assert_eq!(control_structures.verify("", "for(i = 0; i < n; ++i)").len(), 1);
+
+		assert_eq!(control_structures.verify("", "if\t(condition)").len(), 1);
+		assert_eq!(control_structures.verify("", "while  (condition)").len(), 1);
+
 	}
 }

@@ -57,7 +57,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Semicolon must be followed by a newline and must not be preceded by a whitespace, except if alone on a line.
 - [x] Comma must be followed by a single space, except if it's the last non white character of the line (and not precedeed by whitespaces).
 - [ ] All binary and ternary operator must be padded on the left and right by one space, including assignement operator.
-- [ ] Structure, enum and union fields must be aligned with the type name.
+- [ ] Structure and union fields must be aligned with the type name.
 
 ### Comment
 - [x] Multiline comments delimiters must appear on their on line.

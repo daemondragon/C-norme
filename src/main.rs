@@ -8,11 +8,12 @@ use rules::Rule;
 
 fn main() {
 	let mut rules = Vec::<Box<Rule>>::new();
-	//space.rs
+	//indentation.rs
 	rules.push(Box::new(rules::LineSize::new(80)));
 	rules.push(Box::new(rules::SpaceIndentation::new()));
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
 	rules.push(Box::new(rules::Comma::new()));
+	rules.push(Box::new(rules::ControlStructures::new()));
 
 	//brace.rs
 	rules.push(Box::new(rules::OwnLineBrace::new()));
@@ -45,6 +46,9 @@ fn main() {
 	rules.push(Box::new(rules::MaxExportedFunctions::new(5)));
 	rules.push(Box::new(rules::FunctionParametersIndentation::new()));
 	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));
+
+	//naming.rs
+	rules.push(Box::new(rules::LowercaseNames::new()));
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
