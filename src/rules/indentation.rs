@@ -243,7 +243,8 @@ impl Rule for StructureFieldsIndentation {
 				level -= 1;
 			}
 
-			if level <= 0 && (line.contains("struct") || line.contains("union")) && !line.contains("(") {
+			if level <= 0 && (line.contains("struct") || line.contains("union")) &&
+				!(line.contains("(") || line.contains(",") || line.contains(")")) {
 				//Too avoid been triggered in function declaration.
 				in_structure = true;
 				have_typedef = line.contains("typedef");

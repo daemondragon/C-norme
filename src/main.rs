@@ -16,7 +16,6 @@ fn main() {
 	rules.push(Box::new(rules::ControlStructures::new()));
 	rules.push(Box::new(rules::StructureFieldsIndentation::new()));
 
-
 	//brace.rs
 	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::IndentationLevel::new(4)));
@@ -51,6 +50,7 @@ fn main() {
 
 	//naming.rs
 	rules.push(Box::new(rules::LowercaseNames::new()));
+	rules.push(Box::new(rules::Typedef::new()));
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
@@ -60,8 +60,7 @@ fn main() {
 	verify(&rules, &filenames);
 }
 
-fn add_file_or_directory(mut filenames: &mut Vec<String>, pathname: &str)
-{
+fn add_file_or_directory(mut filenames: &mut Vec<String>, pathname: &str) {
 	let path = Path::new(pathname);
 	if path.is_file() {
 		filenames.push(String::from(pathname));
@@ -75,8 +74,7 @@ fn add_file_or_directory(mut filenames: &mut Vec<String>, pathname: &str)
 	}
 }
 
-fn verify(rules: &Vec<Box<Rule>>, filenames: &Vec<String>)
-{
+fn verify(rules: &Vec<Box<Rule>>, filenames: &Vec<String>) {
 	for filename in filenames {
 		let mut file = File::open(&filename).expect("file not found");
 		let mut content = String::new();

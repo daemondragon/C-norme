@@ -49,6 +49,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [ ] One declaration per line (in function, structure, enum or union).
 - [ ] One statement per line.
 - [x] Function, variable and file names must be in lowercase.
+- [ ] Structures and unions must be passed by address in functions.
 
 ### Indentation
 - [x] Space instead of tab.
@@ -90,10 +91,10 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Enumerations values must appear on their own line.
 
 ### Typedef
-- [ ] Structures names must be prefixed by 's_'.
-- [ ] Unions names must be prefixed by 'u_'.
-- [ ] Enumerations names must be prefixed by 'e_'.
-- [ ] Basic type aliasing must start with 't_'. 't_' alone are prohibited.
+- [x] Structures names must be prefixed by 's_'.
+- [x] Unions names must be prefixed by 'u_'.
+- [x] Enumerations names must be prefixed by 'e_'.
+- [x] Basic type aliasing must start with 't_'. 't_' alone are prohibited.
 - [ ] If the type already have 'e_', 'f_', 's_', 't_', 'u_' as prefix, it has to be keep.
 
 More rules to be added later...

@@ -40,6 +40,92 @@ impl Rule for LowercaseNames {
 	}
 }
 
+
+
+enum TypedefType {
+	Normal,
+	Struct,
+	Enum,
+	Union
+}
+
+
+pub struct Typedef {
+
+}
+
+impl Typedef {
+	pub fn new() -> Typedef {
+		Typedef { }
+	}
+}
+
+impl Rule for Typedef {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut indentation = 0;
+		let mut in_typedef = false;
+		let mut typedef_type = TypedefType::Normal;
+
+		for line in content.lines() {
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0 {
+				indentation -= 1;
+			}
+
+			if indentation <= 0 {
+				if line.contains("typedef") {
+					typedef_type = TypedefType::Normal;
+					if line.contains("struct") {
+						typedef_type = TypedefType::Struct;
+					}
+					else if line.contains("enum") {
+						typedef_type = TypedefType::Enum;
+					}
+					else if line.contains("union") {
+						typedef_type = TypedefType::Union;
+					}
+
+					in_typedef = true;
+				}
+				if in_typedef && line.contains(";") {
+					let alias = line.split_whitespace().last().unwrap();
+					if alias.len() <= 2 {
+						errors.push(format!("[{}:{}]Anonymous typedef mustn't be used.", filename, line_number));
+					}
+					else {
+						match typedef_type {
+							TypedefType::Normal if !(alias.starts_with("t_") || alias.starts_with("f_")) => {
+								errors.push(format!("[{}:{}]Typedef alias {} must start with 't_' or 'f_'.", filename, line_number, alias));
+							},
+							TypedefType::Struct if !alias.starts_with("s_") => {
+								errors.push(format!("[{}:{}]Struct typedef alias {} must start with 's_'.", filename, line_number, alias));
+							},
+							TypedefType::Enum if !alias.starts_with("e_") => {
+								errors.push(format!("[{}:{}]Enum typedef alias {} must start with 'e_'.", filename, line_number, alias));
+							},
+							TypedefType::Union if !alias.starts_with("u_") => {
+								errors.push(format!("[{}:{}]Typedef alias {} must start with 'u_'.", filename, line_number, alias));
+							},
+							_ => {}
+						}
+					}
+					in_typedef = false;
+				}
+				
+			} 
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -55,5 +141,20 @@ mod test {
 		assert_ne!(lowercase_names.verify("Test.c", "dccc").len(), 0);
 		assert_ne!(lowercase_names.verify("", "f(int ARG1, int arg2)\n{\n}").len(), 0);
 		assert_ne!(lowercase_names.verify("", "Function(int arg1, int arg2)\n{\n}").len(), 0);
+	}
+
+	#[test]
+	fn typedef() {
+		let typedef = Typedef::new();
+
+		assert_eq!(typedef.verify("", "typedef unsigned char t_character;").len(), 0);
+		assert_eq!(typedef.verify("", "typedef struct\n{\n}\n s_truct;").len(), 0);
+		assert_eq!(typedef.verify("", "typedef enum\n{\n}\n e_num;").len(), 0);
+		assert_eq!(typedef.verify("", "typedef union\n{\n}\n u_nion;").len(), 0);
+
+		assert_eq!(typedef.verify("", "typedef unsigned char character;").len(), 1);
+		assert_eq!(typedef.verify("", "typedef struct\n{\n}\n t_truct;").len(), 1);
+		assert_eq!(typedef.verify("", "typedef enum\n{\n}\n s_num;").len(), 1);
+		assert_eq!(typedef.verify("", "typedef union\n{\n}\n union;").len(), 1);
 	}
 }
