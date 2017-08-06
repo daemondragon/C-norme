@@ -213,6 +213,68 @@ impl Rule for ControlStructures {
 
 
 
+pub struct StructureFieldsIndentation {
+	
+}
+
+impl StructureFieldsIndentation {
+	pub fn new() -> StructureFieldsIndentation {
+		StructureFieldsIndentation { }
+	}
+}
+
+//Expect Semicolon, OwnLineBrace and Trailing WhiteSpace rules to be true.
+impl Rule for StructureFieldsIndentation {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;
+
+		let mut in_structure = false;
+		let mut have_typedef = false;
+		let mut level = 0;
+		let mut indentation = 0;
+
+
+		for line in content.lines() {
+			if line.contains("{") {
+				level += 1;
+			}
+			if line.contains("}") && level > 0 {
+				level -= 1;
+			}
+
+			if level <= 0 && (line.contains("struct") || line.contains("union")) && !line.contains("(") {
+				//Too avoid been triggered in function declaration.
+				in_structure = true;
+				have_typedef = line.contains("typedef");
+			}
+
+			if in_structure {
+				if !line.contains("{") && !(!have_typedef && line.contains("}")) && (!line.contains("typedef") || line.split_whitespace().count() > 2) {
+					//Indentation check is needed (else can be '{' or '};')
+					let current_indentation = line.len() - line.split_whitespace().last().unwrap().len();
+					if indentation <= 0 {
+						indentation = current_indentation;
+					}
+					else if current_indentation != indentation
+					{
+						errors.push(format!("[{}:{}]Wrong field indentation. Expected {} got {}.", filename, line_number, indentation, current_indentation));
+					}
+				}
+				if line.contains("}") {
+					in_structure = false;
+					indentation = 0;
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -304,5 +366,22 @@ mod test {
 		assert_eq!(control_structures.verify("", "if\t(condition)").len(), 1);
 		assert_eq!(control_structures.verify("", "while  (condition)").len(), 1);
 
+	}
+
+	#[test]
+	fn structure_fields_indentation()
+	{
+		let structure_fields_indentation = StructureFieldsIndentation::new();
+
+		assert_eq!(structure_fields_indentation.verify("", "struct  test\n{\n    int arg1;\n};\n").len(), 0);
+		assert_eq!(structure_fields_indentation.verify("", "struct  test\n{\n    int arg1;\n    int arg2;\n};\n").len(), 0);
+		assert_eq!(structure_fields_indentation.verify("", "typedef struct test\n{\n           int arg1;\n}              s_test;\n").len(), 0);
+		assert_eq!(structure_fields_indentation.verify("", "typedef struct\n{\n           int arg1;\n}              s_test;\n").len(), 0);
+
+
+		assert_eq!(structure_fields_indentation.verify("", "struct   test\n{\n    int arg1;\n};\n").len(), 1);
+		assert_eq!(structure_fields_indentation.verify("", "struct  test\n{\n   int arg1;\n     int arg2;\n};\n").len(), 2);
+		assert_eq!(structure_fields_indentation.verify("", "typedef struct test\n{\n           int arg1;\n}     s_test;\n").len(), 1);
+		assert_eq!(structure_fields_indentation.verify("", "typedef struct\n{\n    int arg1;\n} s_test;\n").len(), 1);
 	}
 }

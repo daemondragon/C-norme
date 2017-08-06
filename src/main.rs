@@ -14,6 +14,8 @@ fn main() {
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
 	rules.push(Box::new(rules::Comma::new()));
 	rules.push(Box::new(rules::ControlStructures::new()));
+	rules.push(Box::new(rules::StructureFieldsIndentation::new()));
+
 
 	//brace.rs
 	rules.push(Box::new(rules::OwnLineBrace::new()));

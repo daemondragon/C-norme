@@ -87,7 +87,7 @@ impl Rule for FunctionMaxArguments {
 			if line.contains("{") {
 				indentation += 1;
 			}
-			if line.contains("}") && indentation > 0{
+			if line.contains("}") && indentation > 0 {
 				indentation -= 1;
 			}
 
@@ -145,7 +145,7 @@ impl Rule for FunctionBlankLines {
 			if line.contains("{") {
 				indentation += 1;
 			}
-			if line.contains("}") && indentation > 0{
+			if line.contains("}") && indentation > 0 {
 				indentation -= 1;
 			}
 
@@ -204,7 +204,7 @@ impl Rule for FunctionStartParenthesis {
 			if line.contains("{") {
 				indentation += 1;
 			}
-			if line.contains("}") && indentation > 0{
+			if line.contains("}") && indentation > 0 {
 				indentation -= 1;
 			}
 			
@@ -326,7 +326,7 @@ impl Rule for FunctionParametersIndentation {
 			if line.contains("{") {
 				indentation += 1;
 			}
-			if line.contains("}") && indentation > 0{
+			if line.contains("}") && indentation > 0 {
 				indentation -= 1;
 			}
 
@@ -378,8 +378,12 @@ impl Rule for FunctionsPrototypeLocation {
 		let mut indentation = 0;
 
 		for line in content.lines() {
-			indentation += line.chars().filter(|x| *x == '{').count();
-			indentation -= line.chars().filter(|x| *x == '}').count();
+			if line.contains("{") {
+				indentation += 1;
+			}
+			if line.contains("}") && indentation > 0 {
+				indentation -= 1;
+			}
 
 			if indentation <= 0 && line.contains(")") && line.contains(";"){
 				errors.push(format!("[{}:{}]Functions prototype must be located in header file.", filename, line_number));
