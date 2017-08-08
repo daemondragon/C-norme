@@ -192,14 +192,15 @@ impl ControlStructures {
 	}
 }
 
+//Expect OwnLineBrace rule to be true.
 impl Rule for ControlStructures {
 	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
 		let mut errors = Vec::new();
 		let mut line_number: usize = 1;
 
 		for line in content.lines() {
-			for element in ["if", "for", "while", "switch"].iter() {
-				if line.contains(element) && !line.contains(&(String::from(*element) + " (")) {
+			for element in ["else if", "if", "for", "while", "switch"].iter() {
+				if line.trim_left().starts_with(element) && !line.contains(&(String::from(*element) + " (")) {
 					errors.push(format!("[{}:{}]{} must be followed by ' ('.", filename, line_number, element));
 				}
 			}
@@ -251,7 +252,7 @@ impl Rule for StructureFieldsIndentation {
 			}
 
 			if in_structure {
-				if !line.contains("{") && !(!have_typedef && line.contains("}")) && (!line.contains("typedef") || line.split_whitespace().count() > 2) {
+				if !line.contains("{") && line.trim().len() > 0 && !(!have_typedef && line.contains("}")) && (!line.contains("typedef") || line.split_whitespace().count() > 2) {
 					//Indentation check is needed (else can be '{' or '};')
 					let current_indentation = line.len() - line.split_whitespace().last().unwrap().len();
 					if indentation <= 0 {
@@ -357,6 +358,9 @@ mod test {
 		assert_eq!(control_structures.verify("", "switch (condition)").len(), 0);
 		assert_eq!(control_structures.verify("", "else if (condition)").len(), 0);
 		assert_eq!(control_structures.verify("", "for (i = 0; i < n; ++i)").len(), 0);
+
+		assert_eq!(control_structures.verify("", "#if").len(), 0);
+		assert_eq!(control_structures.verify("", "rediffusion").len(), 0);
 
 		assert_eq!(control_structures.verify("", "if(condition)").len(), 1);
 		assert_eq!(control_structures.verify("", "while(condition)").len(), 1);

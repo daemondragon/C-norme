@@ -97,6 +97,17 @@ impl Rule for Typedef {
 					if alias.len() <= 2 {
 						errors.push(format!("[{}:{}]Anonymous typedef mustn't be used.", filename, line_number));
 					}
+					else if line.contains("typedef") && line.split_whitespace().count() == 3 {
+						let old = line.split_whitespace().nth(1).unwrap();
+						let new = line.split_whitespace().nth(2).unwrap();
+
+						if ["s_", "u_", "e_", "t_", "f_"].iter().any(|x| old.starts_with(x)) {
+							let start: String = old.chars().take(2).collect();
+							if !new.starts_with(&start) {
+								errors.push(format!("[{}:{}]Typedef alias {} must start with '{}'.", filename, line_number, alias, start));
+							}
+						}
+					}
 					else {
 						match typedef_type {
 							TypedefType::Normal if !(alias.starts_with("t_") || alias.starts_with("f_")) => {
@@ -156,5 +167,9 @@ mod test {
 		assert_eq!(typedef.verify("", "typedef struct\n{\n}\n t_truct;").len(), 1);
 		assert_eq!(typedef.verify("", "typedef enum\n{\n}\n s_num;").len(), 1);
 		assert_eq!(typedef.verify("", "typedef union\n{\n}\n union;").len(), 1);
+
+
+		assert_eq!(typedef.verify("", "typedef u_nion u_newunion;").len(), 0);
+		assert_eq!(typedef.verify("", "typedef s_nion u_newunion;").len(), 1);
 	}
 }

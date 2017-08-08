@@ -95,6 +95,6 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Unions names must be prefixed by 'u_'.
 - [x] Enumerations names must be prefixed by 'e_'.
 - [x] Basic type aliasing must start with 't_'. 't_' alone are prohibited.
-- [ ] If the type already have 'e_', 'f_', 's_', 't_', 'u_' as prefix, it has to be keep.
+- [x] If the type already have 'e_', 'f_', 's_', 't_', 'u_' as prefix, it has to be keep.
 
 More rules to be added later...
