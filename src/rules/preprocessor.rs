@@ -134,10 +134,14 @@ impl Rule for MultiLinesMacro {
 			}
 
 			if in_multi_line_macro {
-				match line.rfind("\\") {
-					Some(index) if index != alignement => errors.push(format!("[{}:{}]Multi lines macro must have \\ aligned. Expected alignement on column {} got {}", filename, line_number, alignement, index)),
-					Some(_) => {},
-					None => { in_multi_line_macro = false; },
+				if line.trim_right().ends_with("\\") {
+					match line.rfind("\\") {
+						Some(index) if index != alignement => errors.push(format!("[{}:{}]Multi lines macro must have \\ aligned. Expected alignement on column {} got {}", filename, line_number, alignement, index)),
+						_ => {}
+					}
+				}
+				else {
+					in_multi_line_macro = false;
 				}
 			}
 
@@ -263,7 +267,7 @@ impl IncludePreprocessor {
 	}
 }
 
-//Expect PreprocessorOnFirstColumn rule true for the given file,
+//Expect PreprocessorOnFirstColumn and MultiLinesComment rules to be true for the given file,
 impl Rule for IncludePreprocessor {
 	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
 		let mut errors = Vec::new();
@@ -271,6 +275,7 @@ impl Rule for IncludePreprocessor {
 
 		let mut have_seen_code = false;
 		let mut multiline_macro = false;
+		let mut multi_lines_comment = false;
 
 		for line in content.lines() {
 			if line.starts_with("#") {
@@ -281,13 +286,22 @@ impl Rule for IncludePreprocessor {
 					errors.push(format!("[{}:{}]All #include directive must appear at the start of the file.", filename, line_number));
 				}
 			}
-			else
+			else if !line.trim_left().starts_with("//")
 			{
-				if !multiline_macro && line.trim().len() > 0 {
-					have_seen_code = true;
+				if line.contains("/*") {
+					multi_lines_comment = true;
 				}
-				if multiline_macro && !line.contains("\\") {
-					multiline_macro = false;
+				
+				if !multi_lines_comment {
+					if !multiline_macro && line.trim().len() > 0 {
+						have_seen_code = true;
+					}
+					if multiline_macro && !line.contains("\\") {
+						multiline_macro = false;
+					}
+				}
+				else if line.contains("*/") {
+					multi_lines_comment = false;
 				}
 			}
 
@@ -475,6 +489,8 @@ mod test {
 		assert_eq!(include_preprocessor.verify("", "#ifdef HELLO").len(), 0);
 		assert_eq!(include_preprocessor.verify("", "something").len(), 0);
 		assert_eq!(include_preprocessor.verify("", "# include").len(), 0);
+		assert_eq!(include_preprocessor.verify("", "//Comment\n#ifdef HELLO").len(), 0);
+		assert_eq!(include_preprocessor.verify("", "/*\n**Comment\n*/\n#include").len(), 0);
 
 		assert_eq!(include_preprocessor.verify("", "#define something\n#include").len(), 0);
 		assert_eq!(include_preprocessor.verify("", "#define something\\\nend_of_mcro_definition\n#include").len(), 0);

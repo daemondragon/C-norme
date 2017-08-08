@@ -113,8 +113,8 @@ impl Rule for Enum {
 				if line.contains("}") {
 					in_enum = false;
 				}
-				if line.to_uppercase() != line {
-					errors.push(format!("[{}:{}]Enum values must be entirely capitalized.", filename, line_number));
+				if in_enum && line.to_uppercase() != line {
+					errors.push(format!("[{}:{}]Enum values must be entirely capitalized. Expected '{}' got '{}'", filename, line_number, line.to_uppercase(), line));
 				}
 				if line.contains(",") &&
 					line.trim().len() > 1 &&//To prevent having only a comma on a line.
@@ -123,7 +123,8 @@ impl Rule for Enum {
 				}
 			}
 
-			if line.contains("enum") {
+			//Start_with '**' -> multilines comments intermediary lines.
+			if line.contains("enum") && !line.trim_left().starts_with("//") && !line.trim_left().starts_with("**") {
 				in_enum = true;
 			}
 
@@ -152,7 +153,7 @@ impl Rule for StaticVariable {
 		let mut line_number: usize = 1;
 
 		for line in content.lines() {
-			if line.contains("static") && !line.contains("static const") {
+			if line.contains("static") && (!line.contains("(") || line.contains("=")) && !line.contains("static const") {
 				errors.push(format!("[{}:{}]Static variable must be const.", filename, line_number));
 			}
 
@@ -215,7 +216,9 @@ mod test {
 		assert_eq!(static_variable.verify("", "something;").len(), 0);
 		assert_eq!(static_variable.verify("", "const something;").len(), 0);
 		assert_eq!(static_variable.verify("", "static const something;").len(), 0);
+		assert_eq!(static_variable.verify("", "static function(parameter...").len(), 0);
 
 		assert_eq!(static_variable.verify("", "static something;").len(), 1);
+		assert_eq!(static_variable.verify("", "static var = function(parameter);").len(), 1);
 	}
 }

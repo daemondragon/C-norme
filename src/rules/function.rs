@@ -1,6 +1,5 @@
 use rules::Rule;
 
-
 pub struct FunctionMaxCodeLines {
 	max_lines: usize
 }
@@ -199,6 +198,8 @@ impl Rule for FunctionStartParenthesis {
 		let mut line_number: usize = 1;
 
 		let mut indentation = 0;
+
+		let mut in_macro = false;
 		
 		for line in content.lines() {
 			if line.contains("{") {
@@ -208,15 +209,26 @@ impl Rule for FunctionStartParenthesis {
 				indentation -= 1;
 			}
 			
-			if indentation == 0 {
-				match line.chars().position(|x| x == '(') {
-					Some(p) if p > 0 => {
-						if line.chars().nth(p - 1).unwrap().is_whitespace() {
-							errors.push(format!("[{}:{}]Function parenthesis must be next to function name.", filename, line_number));
-						}
-					},
-					_ => (),
+
+			if line.trim_left().starts_with("#") {
+				in_macro = true;
+			}
+
+			if !in_macro {
+				if indentation == 0 && !line.trim_left().starts_with("//") && !line.trim_left().starts_with("**") {
+					match line.chars().position(|x| x == '(') {
+						Some(p) if p > 0 => {
+							if line.chars().nth(p - 1).unwrap().is_whitespace() {
+								errors.push(format!("[{}:{}]Function parenthesis must be next to function name.", filename, line_number));
+							}
+						},
+						_ => (),
+					}
 				}
+			}
+			else
+			{
+				in_macro = line.trim_right().ends_with("\\");
 			}
 
 			line_number += 1;
@@ -250,7 +262,7 @@ impl Rule for MaxFunctionsPerSourceFile {
 		let mut nb_functions: usize = 0;
 		
 		for line in content.lines() {			
-			if line.starts_with("{") {
+			if line.starts_with("{"){
 				nb_functions += 1;
 			}
 		}
@@ -287,7 +299,8 @@ impl Rule for MaxExportedFunctions {
 		let mut nb_functions: usize = 0;
 		
 		for line in content.lines() {			
-			if line.contains("(") && !line.starts_with("#") && !line.ends_with("\\"){
+			if line.contains("(") && !line.starts_with("#") && !line.ends_with("\\") &&
+				!line.trim_left().starts_with("//") & &!line.trim_left().starts_with("**") {
 				nb_functions += 1;
 			}
 		}
@@ -377,6 +390,8 @@ impl Rule for FunctionsPrototypeLocation {
 		
 		let mut indentation = 0;
 
+		let mut in_macro = false;
+
 		for line in content.lines() {
 			if line.contains("{") {
 				indentation += 1;
@@ -384,9 +399,17 @@ impl Rule for FunctionsPrototypeLocation {
 			if line.contains("}") && indentation > 0 {
 				indentation -= 1;
 			}
+			if line.trim_left().starts_with("#") {
+				in_macro = true;
+			}
 
-			if indentation <= 0 && line.contains(")") && line.contains(";"){
+			if indentation <= 0 && line.contains(")") && line.contains(";")
+				&& !line.contains("=") && !in_macro {
 				errors.push(format!("[{}:{}]Functions prototype must be located in header file.", filename, line_number));
+			}
+
+			if in_macro {
+				in_macro = line.trim_right().ends_with("\\");
 			}
 
 			line_number += 1;
@@ -456,6 +479,7 @@ mod test {
 		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n}").len(), 0);
 		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n (\n}").len(), 0);
 		assert_eq!(function_start_parenthesis.verify("", "f()\n{\n\t(\n}").len(), 0);
+		assert_eq!(function_start_parenthesis.verify("", "int g_global_var = f();").len(), 0);
 
 		assert_eq!(function_start_parenthesis.verify("", "f ()\n{\n\n}").len(), 1);
 		assert_eq!(function_start_parenthesis.verify("", "f   ()\n{\n\n}").len(), 1);

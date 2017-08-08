@@ -25,7 +25,7 @@ impl Rule for LowercaseNames {
 			if line.starts_with("#") {
 				in_macro = true;
 			}
-			else if !in_macro && !line.trim_left().starts_with("//") && line.to_lowercase() != line {
+			else if !in_macro && !line.trim_left().starts_with("//") && !line.trim_left().starts_with("**") && line.replace("NULL", "null").to_lowercase() != line {
 				errors.push(format!("[{}:{}]Functions and variables name must be in lowercase.", filename, line_number));
 			}
 
@@ -104,23 +104,23 @@ impl Rule for Typedef {
 						if ["s_", "u_", "e_", "t_", "f_"].iter().any(|x| old.starts_with(x)) {
 							let start: String = old.chars().take(2).collect();
 							if !new.starts_with(&start) {
-								errors.push(format!("[{}:{}]Typedef alias {} must start with '{}'.", filename, line_number, alias, start));
+								errors.push(format!("[{}:{}]Typedef '{}' must start with '{}'.", filename, line_number, alias, start));
 							}
 						}
 					}
 					else {
 						match typedef_type {
 							TypedefType::Normal if !(alias.starts_with("t_") || alias.starts_with("f_")) => {
-								errors.push(format!("[{}:{}]Typedef alias {} must start with 't_' or 'f_'.", filename, line_number, alias));
+								errors.push(format!("[{}:{}]Typedef '{}' must start with 't_' or 'f_'.", filename, line_number, alias));
 							},
 							TypedefType::Struct if !alias.starts_with("s_") => {
-								errors.push(format!("[{}:{}]Struct typedef alias {} must start with 's_'.", filename, line_number, alias));
+								errors.push(format!("[{}:{}]Struct typedef '{}' must start with 's_'.", filename, line_number, alias));
 							},
 							TypedefType::Enum if !alias.starts_with("e_") => {
-								errors.push(format!("[{}:{}]Enum typedef alias {} must start with 'e_'.", filename, line_number, alias));
+								errors.push(format!("[{}:{}]Enum typedef '{}' must start with 'e_'.", filename, line_number, alias));
 							},
 							TypedefType::Union if !alias.starts_with("u_") => {
-								errors.push(format!("[{}:{}]Typedef alias {} must start with 'u_'.", filename, line_number, alias));
+								errors.push(format!("[{}:{}]Union typedef '{}' must start with 'u_'.", filename, line_number, alias));
 							},
 							_ => {}
 						}

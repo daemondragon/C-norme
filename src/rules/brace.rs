@@ -13,15 +13,17 @@ impl OwnLineBrace {
 impl Rule for OwnLineBrace {
 	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
 		let mut errors = Vec::new();
-		let mut line_number: usize = 1;
+		let mut line_number: usize = 1;		
 
 		for line in content.lines() {
-			if line.contains("{") && line.chars().filter(|c| !c.is_whitespace()).count() > 1 {
+			if line.contains("{") && !(line.trim().len() == 1 ||
+				(line.chars().filter(|c| !c.is_whitespace()).count() == 2 && line.trim_right().ends_with("\\"))) {
 				errors.push(format!("[{}:{}]Opening brace must be on their own line.", filename, line_number));
 			}
-			else if line.contains("}") {
-				let nb_non_white_char =  line.chars().filter(|c| !c.is_whitespace()).count();
-				if !(nb_non_white_char == 1 || (nb_non_white_char == 2 && line.contains("};"))) {
+			else if line.contains("}") && !(line.trim().len() == 1 ||
+					(line.chars().filter(|c| !c.is_whitespace()).count() == 2 && line.trim_right().ends_with("\\"))) {
+
+				if !line.ends_with(";") {
 					errors.push(format!("[{}:{}]Closing brace must be on their own line.", filename, line_number));
 				}
 			}
@@ -95,6 +97,7 @@ mod test {
 		assert_eq!(own_line_brace.verify("", "{\nsome text\n}\n").len(), 0);
 		assert_eq!(own_line_brace.verify("", "  {  ").len(), 0);
 		assert_eq!(own_line_brace.verify("", "};").len(), 0);
+		assert_eq!(own_line_brace.verify("", "} something;").len(), 0);//End of the typedef struct of do while loop.
 
 		assert_ne!(own_line_brace.verify("", "{}\n").len(), 0);
 		assert_ne!(own_line_brace.verify("", "}}").len(), 0);
@@ -102,7 +105,7 @@ mod test {
 
 		assert_eq!(own_line_brace.verify("", "{some").len(), 1);
 		assert_eq!(own_line_brace.verify("", ";}").len(), 1);
-		assert_eq!(own_line_brace.verify("", "} ;").len(), 1);
+		
 
 	}
 

@@ -98,6 +98,7 @@ impl Semicolon {
 	}
 }
 
+//Expect IndentationLevel rule to be true
 impl Rule for Semicolon {
 	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
 		let mut errors = Vec::new();
@@ -106,23 +107,22 @@ impl Rule for Semicolon {
 		for line in content.lines() {
 			match line.chars().filter(|x| *x == ';').count() {
 				n if n == 1 => {
-					if line.contains("while") {
+					if line.contains(" while") {
 						errors.push(format!("[{}:{}]Too much semicolon found on this line.", filename, line_number));
 					}
 
-					if line.chars().last().unwrap() != ';' {
+					if !line.ends_with(";") && !line.ends_with("\\"){
 						errors.push(format!("[{}:{}]Semicolon must be followed by a newline.", filename, line_number));
 					}
-					else {
-						let left_part = line.split(";").next().unwrap();
-						if !left_part.trim_right().is_empty() &&
-							left_part.trim_right().len() != left_part.len() {
-							errors.push(format!("[{}:{}]Semicolon must not be precedeed by whitespaces.", filename, line_number));
-						}
+					
+					let left_part = line.split(";").next().unwrap();
+					if !left_part.trim_right().is_empty() &&
+						left_part.trim_right().len() != left_part.len() {
+						errors.push(format!("[{}:{}]Semicolon must not be precedeed by whitespaces.", filename, line_number));
 					}
 				},
 				n if n >= 2 => {
-					if !line.contains("for") || n > 2 {
+					if !line.contains(" for") || n > 2 {
 						errors.push(format!("[{}:{}]Too much semicolon found on this line.", filename, line_number));
 					}
 				},
@@ -245,7 +245,8 @@ impl Rule for StructureFieldsIndentation {
 			}
 
 			if level <= 0 && (line.contains("struct") || line.contains("union")) &&
-				!(line.contains("(") || line.contains(",") || line.contains(")")) {
+				!(line.contains("(") || line.contains(",") || line.contains(")") ||
+					line.trim_left().starts_with("//") || line.trim_left().starts_with("**")) {
 				//Too avoid been triggered in function declaration.
 				in_structure = true;
 				have_typedef = line.contains("typedef");
@@ -323,10 +324,11 @@ mod test {
 		assert_eq!(semicolon.verify("", ";").len(), 0);
 		assert_eq!(semicolon.verify("", "something;").len(), 0);
 		assert_eq!(semicolon.verify("", "	;").len(), 0);
-		assert_eq!(semicolon.verify("", "for ( ; ;)").len(), 0);
+		assert_eq!(semicolon.verify("", "    for ( ; ;)").len(), 0);
+		assert_eq!(semicolon.verify("", "#define MACRO(something) \\\n do_something();   \\\n other_things();").len(), 0);
 
-		assert_ne!(semicolon.verify("", "for (;;);").len(), 0);
-		assert_ne!(semicolon.verify("", "return ;").len(), 0);
+		assert_ne!(semicolon.verify("", " for (;;);").len(), 0);
+		assert_ne!(semicolon.verify("", " return ;").len(), 0);
 		assert_ne!(semicolon.verify("", ";;;").len(), 0);
 		assert_ne!(semicolon.verify("", ";\t").len(), 0);
 	}
