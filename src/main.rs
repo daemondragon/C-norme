@@ -26,6 +26,7 @@ fn main() {
 	rules.push(Box::new(rules::Enum::new()));
 	rules.push(Box::new(rules::Semicolon::new()));
 	rules.push(Box::new(rules::StaticVariable::new()));
+	rules.push(Box::new(rules::Typedef::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
@@ -49,8 +50,7 @@ fn main() {
 	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));
 
 	//naming.rs
-	rules.push(Box::new(rules::LowercaseNames::new()));
-	rules.push(Box::new(rules::Typedef::new()));
+	
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
