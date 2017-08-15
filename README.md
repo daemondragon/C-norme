@@ -44,7 +44,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] All braces must be on their own line.
 - [x] The goto statement must not be used.
 - [x] Static variables must be constant.
-- [ ] Global variables must start with 'g_'.
+- [x] Global variables must start with 'g_'.
 - [ ] The pointer symbol '*' must appear next to the variable name, not the type.
 - [ ] One declaration per line (in function, structure, enum or union).
 - [ ] One statement per line.

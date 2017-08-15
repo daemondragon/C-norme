@@ -421,8 +421,8 @@ impl Rule for FunctionsPrototypeLocation {
 
 
 
-#[cfg(test)]
-mod test {
+#[cfg(tests)]
+mod tests {
 	use super::*;
 	#[test]
 	fn function_max_code_lines() {

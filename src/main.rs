@@ -20,13 +20,16 @@ fn main() {
 	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::IndentationLevel::new(4)));
 
+	//naming.rs
+	rules.push(Box::new(rules::Typedef::new()));
+	rules.push(Box::new(rules::Global::new()));
+
 	//misc.rs
 	rules.push(Box::new(rules::MultiLinesComment::new()));
 	rules.push(Box::new(rules::Goto::new()));
 	rules.push(Box::new(rules::Enum::new()));
 	rules.push(Box::new(rules::Semicolon::new()));
 	rules.push(Box::new(rules::StaticVariable::new()));
-	rules.push(Box::new(rules::Typedef::new()));
 
 	//preprocessor.rs
 	rules.push(Box::new(rules::PreprocessorOnFirstColumn::new()));
@@ -47,10 +50,7 @@ fn main() {
 	rules.push(Box::new(rules::MaxFunctionsPerSourceFile::new(10)));
 	rules.push(Box::new(rules::MaxExportedFunctions::new(5)));
 	rules.push(Box::new(rules::FunctionParametersIndentation::new()));
-	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));
-
-	//naming.rs
-	
+	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));	
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
@@ -74,7 +74,7 @@ fn add_file_or_directory(mut filenames: &mut Vec<String>, pathname: &str) {
 	}
 }
 
-fn verify(rules: &Vec<Box<Rule>>, filenames: &Vec<String>) {
+fn verify(rules: &Vec<Box<Rule>>, filenames: &[String]) {
 	for filename in filenames {
 		let mut file = File::open(&filename).expect("file not found");
 		let mut content = String::new();

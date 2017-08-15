@@ -398,7 +398,7 @@ impl Rule for HeaderGuard {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 	use super::*;
 	#[test]
 	fn preprocessor_on_first_column() {

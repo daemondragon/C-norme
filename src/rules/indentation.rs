@@ -279,7 +279,7 @@ impl Rule for StructureFieldsIndentation {
 
 
 #[cfg(test)]
-mod test {
+mod tests {
 	use super::*;
 	#[test]
 	fn line_size() {

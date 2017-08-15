@@ -88,7 +88,7 @@ impl Rule for IndentationLevel {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 	use super::*;
 	#[test]
 	fn own_line_brace() {
