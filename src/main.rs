@@ -13,7 +13,6 @@ fn main() {
 	rules.push(Box::new(rules::SpaceIndentation::new()));
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
 	rules.push(Box::new(rules::Comma::new()));
-	rules.push(Box::new(rules::ControlStructures::new()));
 	rules.push(Box::new(rules::StructureFieldsIndentation::new()));
 
 	//brace.rs
@@ -51,6 +50,10 @@ fn main() {
 	rules.push(Box::new(rules::MaxExportedFunctions::new(5)));
 	rules.push(Box::new(rules::FunctionParametersIndentation::new()));
 	rules.push(Box::new(rules::FunctionsPrototypeLocation::new()));	
+
+	//control_structures.rs
+	rules.push(Box::new(rules::ControlStructuresIndentation::new()));
+	rules.push(Box::new(rules::SpecialControlStructuresIndentation::new()));	
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {

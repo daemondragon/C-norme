@@ -58,7 +58,6 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] Comma must be followed by a single space, except if it's the last non white character of the line (and not precedeed by whitespaces).
 - [ ] All binary and ternary operator must be padded on the left and right by one space, including assignement operator.
 - [x] Structure and union fields must be aligned with the type name.
-- [x] Control structure keywords must be followed by a whitespace.
 
 ### Comment
 - [x] Multiline comments delimiters must appear on their on line.
@@ -88,6 +87,14 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 ### Enumeration
 - [x] Enumerations values must be entirely capitalized.
 - [x] Enumerations values must appear on their own line.
+
+### Control structure
+- [x] Control structure keywords must be followed by a whitespace (including return, but only with arguments and sizeof).
+- [x] return (without argument), continue and break statement must be followed directly by a semicolon.
+- [ ] All switch conditions must ends with 'break' or 'return'.
+- [ ] Switch must contains a 'default' block.
+- [ ] Switch must only be used with enumeration.
+- [ ] Each 'case' conditions must be indented from the switch once, as well as the code following the 'case' from it.
 
 ### Typedef
 - [x] Structures names must be prefixed by 's_'.
