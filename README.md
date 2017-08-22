@@ -91,9 +91,9 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 ### Control structure
 - [x] Control structure keywords must be followed by a whitespace (including return, but only with arguments and sizeof).
 - [x] return (without argument), continue and break statement must be followed directly by a semicolon.
-- [ ] All switch conditions must ends with 'break' or 'return'.
-- [ ] Switch must contains a 'default' block.
-- [ ] Switch must only be used with enumeration.
+- [x] All switch conditions must ends with 'break' or 'return'.
+- [x] Switch must contains a 'default' block.
+- [x] Switch must only be used with enumeration.
 - [ ] Each 'case' conditions must be indented from the switch once, as well as the code following the 'case' from it.
 
 ### Typedef

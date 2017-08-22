@@ -53,7 +53,10 @@ fn main() {
 
 	//control_structures.rs
 	rules.push(Box::new(rules::ControlStructuresIndentation::new()));
-	rules.push(Box::new(rules::SpecialControlStructuresIndentation::new()));	
+	rules.push(Box::new(rules::SpecialControlStructuresIndentation::new()));
+	rules.push(Box::new(rules::SwitchDefaultCase::new()));
+	rules.push(Box::new(rules::SwitchEnum::new()));
+	rules.push(Box::new(rules::SwitchEnd::new()));	
 
 	let mut filenames: Vec<String> = Vec::new();
 	for arg in env::args().skip(1) {
