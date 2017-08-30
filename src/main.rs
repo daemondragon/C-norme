@@ -12,18 +12,16 @@ fn main() {
 	rules.push(Box::new(rules::LineSize::new(80)));
 	rules.push(Box::new(rules::SpaceIndentation::new()));
 	rules.push(Box::new(rules::TrailingWhiteSpace::new()));
+	rules.push(Box::new(rules::IndentationLevel::new(4)));
 	rules.push(Box::new(rules::Comma::new()));
 	rules.push(Box::new(rules::StructureFieldsIndentation::new()));
-
-	//brace.rs
-	rules.push(Box::new(rules::OwnLineBrace::new()));
-	rules.push(Box::new(rules::IndentationLevel::new(4)));
 
 	//naming.rs
 	rules.push(Box::new(rules::Typedef::new()));
 	rules.push(Box::new(rules::Global::new()));
 
 	//misc.rs
+	rules.push(Box::new(rules::OwnLineBrace::new()));
 	rules.push(Box::new(rules::MultiLinesComment::new()));
 	rules.push(Box::new(rules::Goto::new()));
 	rules.push(Box::new(rules::Enum::new()));

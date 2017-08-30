@@ -94,7 +94,7 @@ An extract of this norme can be found [here](http://tsunanet.net/~tsuna/codingst
 - [x] All switch conditions must ends with 'break' or 'return'.
 - [x] Switch must contains a 'default' block.
 - [x] Switch must only be used with enumeration.
-- [ ] Each 'case' conditions must be indented from the switch once, as well as the code following the 'case' from it.
+- [x] Each 'case' conditions must be indented from the switch once, as well as the code following the 'case' from it.
 
 ### Typedef
 - [x] Structures names must be prefixed by 's_'.

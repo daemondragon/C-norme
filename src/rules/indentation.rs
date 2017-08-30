@@ -1,5 +1,8 @@
 use rules::Rule;
 
+use std::str::Lines;
+use std::iter::Peekable;
+
 pub struct LineSize {
 	max: usize
 }
@@ -87,6 +90,108 @@ impl Rule for TrailingWhiteSpace {
 }
 
 
+#[derive(Debug, PartialEq)]
+enum IndentationType {
+	Basic,//indentation made by {}
+	OneLine,//'if', 'else' ... that can have only the next line indented.
+	SwitchCase
+}
+
+
+pub struct IndentationLevel {
+	nb_spaces: usize
+}
+
+impl IndentationLevel {
+	pub fn new(nb_spaces_per_indentation_level: usize) -> IndentationLevel {
+		IndentationLevel { nb_spaces: nb_spaces_per_indentation_level }
+	}
+
+	fn verify_for_level(&self, filename: &str, lines: &mut Peekable<Lines>, indentation_type: IndentationType, indentation_level: usize,
+		errors: &mut Vec<String>, line_number: &mut usize)
+	{
+		if indentation_type == IndentationType::OneLine {
+			*line_number += 1;
+			if let Some(line) = lines.next() {
+				let current_indentation = line.len() - line.trim_left().len();
+				if current_indentation != indentation_level * self.nb_spaces {
+					errors.push(format!("[{}:{}]Wrong indentation level. Expected {} whitespaces got {}",
+						filename, line_number, indentation_level * self.nb_spaces, current_indentation));
+				}
+			}
+		}
+		else {
+			while let Some(line) = lines.next() {
+				*line_number += 1;
+
+				let current_indentation = line.len() - line.trim_left().len();
+				let needed_indentation = match indentation_type {
+					IndentationType::Basic if line.trim_left().starts_with('}') => (indentation_level - 1) * self.nb_spaces,
+					_ => indentation_level * self.nb_spaces,
+				};
+
+				if line.len() != 0 && current_indentation != needed_indentation {
+					errors.push(format!("[{}:{}]Wrong indentation level. Expected {} whitespaces got {}",
+						filename, line_number, needed_indentation, current_indentation));
+				}
+
+				let mut is_one_line = false;
+				if ["if", "else", "switch", "while", "for"].iter().any(|x| line.trim_left().starts_with(x)) {
+					if let Some(next_line) = lines.peek() {
+						if !next_line.trim_left().starts_with('{') {
+							is_one_line = true;
+						}
+					}
+				}
+				if is_one_line {
+					self.verify_for_level(filename, lines, IndentationType::OneLine, indentation_level + 1, errors, line_number);
+				}
+
+				if indentation_type == IndentationType::Basic {
+					if line.trim_left().starts_with('}') {
+						break;
+					}
+					else if line.trim_left().starts_with('{') {
+						self.verify_for_level(filename, lines, IndentationType::Basic, indentation_level + 1, errors, line_number);
+					}
+					else if ["case", "default"].iter().any(|x| line.trim_left().starts_with(x)) {
+						self.verify_for_level(filename, lines, IndentationType::SwitchCase, indentation_level + 1, errors, line_number);
+					}
+				}
+				else if indentation_type == IndentationType::SwitchCase {
+					if line.trim_left().starts_with("break") {
+						break;
+					}
+					else if  line.trim_left().starts_with("return") {
+						if let Some(next_line) = lines.peek() {
+							if !next_line.trim_left().starts_with("break") {
+								break;
+							}
+						}
+					}
+				}
+				else {
+					unreachable!();
+				}
+			}
+		}
+	}
+}
+
+impl Rule for IndentationLevel {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 0;
+
+		let mut lines = content.lines().peekable();
+
+		self.verify_for_level(filename, &mut lines, IndentationType::Basic, 0, &mut errors, &mut line_number);
+
+		return errors;
+	}
+}
+
+
 
 pub struct Semicolon {
 	
@@ -156,6 +261,10 @@ impl Rule for Comma {
 		for line in content.lines() {
 			let nb_comma = line.chars().filter(|x| *x == ',').count();
 			let mut actual_between = 0;
+
+			if nb_comma <= 0 {
+				continue;
+			}
 
 			for between in line.split(",") {
 				if actual_between < nb_comma {
@@ -286,6 +395,29 @@ mod tests {
 	}
 
 	#[test]
+	fn indentation_level() {
+		let indentation_level = IndentationLevel::new(4);
+
+		assert_eq!(indentation_level.verify("", "{\n    \n}   ").len(), 0);
+		assert_eq!(indentation_level.verify("", "{\n    {\n    }\n}   ").len(), 0);
+		assert_eq!(indentation_level.verify("", "if (true)\n    f();").len(), 0);
+		assert_eq!(indentation_level.verify("", "switch (number)\n{\n    case 1:\n        f();\n        break;\n    case 2:\n        return g();\n}").len(), 0);
+
+		//Wrong indentation
+		assert_eq!(indentation_level.verify("", "             ").len(), 1);
+		assert_eq!(indentation_level.verify("", "{\n 56\n}").len(), 1);
+		assert_eq!(indentation_level.verify("", "{\n     56\n}").len(), 1);
+		assert_eq!(indentation_level.verify("", "{\n    {\n  }\n}   ").len(), 1);
+		assert_eq!(indentation_level.verify("", "{\n    {\n    test\n    }\n}   ").len(), 1);
+
+		assert_eq!(indentation_level.verify("", "if (true)\nf();").len(), 1);
+		assert_eq!(indentation_level.verify("", "if (true)\n    f();\n    g();").len(), 1);
+
+		assert_eq!(indentation_level.verify("", "switch (number)\n{\ncase 1:\n    f();\n    break;\ncase 2:\n    g();\n    break;\n}").len(), 6);
+		assert_eq!(indentation_level.verify("", "switch (number)\n{\n    case 1:\n    f();\n    break;\n    case 2:\n    g();\n    break;\n}").len(), 4);
+	}
+
+	#[test]
 	fn semicolon() {
 		let semicolon = Semicolon::new();
 
@@ -308,13 +440,14 @@ mod tests {
 		assert_eq!(comma.verify("", "something,\nother").len(), 0);
 		assert_eq!(comma.verify("", "something, something else\nother").len(), 0);
 		assert_eq!(comma.verify("", "comma, comma, comma").len(), 0);
+		assert_eq!(comma.verify("", "{\n    {\n    \n}\n}").len(), 0);
 
 		assert_ne!(comma.verify("", "something, \nother").len(), 0);
 		assert_ne!(comma.verify("", "something,\t\nother").len(), 0);
 		assert_ne!(comma.verify("", "     , comma").len(), 0);
 		assert_ne!(comma.verify("", "comma ,comma ,comma").len(), 0);
 		assert_ne!(comma.verify("", "comma , comma , comma").len(), 0);
-		assert_ne!(comma.verify("", "comma,comma,comma").len(), 0);
+		assert_ne!(comma.verify("", "comma,comma,comma").len(), 0);  
 	}
 
 	#[test]

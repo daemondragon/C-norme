@@ -84,7 +84,7 @@ impl Rule for SwitchEnum {
 				if line.trim_left().starts_with(element) {
 					let without_element = line.replace(element, "");
 					if without_element.to_uppercase() != without_element || without_element.find(char::is_numeric).is_some() {
-						errors.push(format!("[{}:{}]Enum must only be used on enums.", filename, line_number));
+						errors.push(format!("[{}:{}]Switch must only be used on enums.", filename, line_number));
 					}
 				}
 			}

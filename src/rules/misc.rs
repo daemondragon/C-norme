@@ -1,5 +1,44 @@
 use rules::Rule;
 
+
+
+pub struct OwnLineBrace {
+
+}
+
+impl OwnLineBrace {
+	pub fn new() -> OwnLineBrace {
+		OwnLineBrace {  }
+	}
+}
+
+impl Rule for OwnLineBrace {
+	fn verify(&self, filename: &str, content: &str) -> Vec<String> {
+		let mut errors = Vec::new();
+		let mut line_number: usize = 1;		
+
+		for line in content.lines() {
+			if line.contains("{") && !(line.trim().len() == 1 ||
+				(line.chars().filter(|c| !c.is_whitespace()).count() == 2 && line.trim_right().ends_with("\\"))) {
+				errors.push(format!("[{}:{}]Opening brace must be on their own line.", filename, line_number));
+			}
+			else if line.contains("}") && !(line.trim().len() == 1 ||
+					(line.chars().filter(|c| !c.is_whitespace()).count() == 2 && line.trim_right().ends_with("\\"))) {
+
+				if !line.ends_with(";") {
+					errors.push(format!("[{}:{}]Closing brace must be on their own line.", filename, line_number));
+				}
+			}
+
+			line_number += 1;
+		}
+
+		return errors;
+	}
+}
+
+
+
 pub struct MultiLinesComment {
 }
 
@@ -168,6 +207,23 @@ impl Rule for StaticVariable {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	#[test]
+	fn own_line_brace() {
+		let own_line_brace = OwnLineBrace::new();
+
+		assert_eq!(own_line_brace.verify("", "{\nsome text\n}\n").len(), 0);
+		assert_eq!(own_line_brace.verify("", "  {  ").len(), 0);
+		assert_eq!(own_line_brace.verify("", "};").len(), 0);
+		assert_eq!(own_line_brace.verify("", "} something;").len(), 0);//End of the typedef struct of do while loop.
+
+		assert_ne!(own_line_brace.verify("", "{}\n").len(), 0);
+		assert_ne!(own_line_brace.verify("", "}}").len(), 0);
+		assert_ne!(own_line_brace.verify("", "{{").len(), 0);
+
+		assert_eq!(own_line_brace.verify("", "{some").len(), 1);
+		assert_eq!(own_line_brace.verify("", ";}").len(), 1);
+	}
+
 	#[test]
 	fn multi_lines_comment() {
 		let multi_lines_comment = MultiLinesComment::new();
