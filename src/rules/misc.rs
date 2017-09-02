@@ -192,7 +192,7 @@ impl Rule for StaticVariable {
 		let mut line_number: usize = 1;
 
 		for line in content.lines() {
-			if line.contains("static") && (!line.contains("(") || line.contains("=")) && !line.contains("static const") {
+			if line.trim_left().starts_with("static ") && (!line.contains("(") || line.contains("=")) && !line.contains("static const") {
 				errors.push(format!("[{}:{}]Static variable must be const.", filename, line_number));
 			}
 
@@ -273,6 +273,8 @@ mod tests {
 		assert_eq!(static_variable.verify("", "const something;").len(), 0);
 		assert_eq!(static_variable.verify("", "static const something;").len(), 0);
 		assert_eq!(static_variable.verify("", "static function(parameter...").len(), 0);
+		assert_eq!(static_variable.verify("", "int some_static_name;").len(), 0);
+		assert_eq!(static_variable.verify("", "//something static something").len(), 0);
 
 		assert_eq!(static_variable.verify("", "static something;").len(), 1);
 		assert_eq!(static_variable.verify("", "static var = function(parameter);").len(), 1);

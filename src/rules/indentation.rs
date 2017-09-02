@@ -136,7 +136,7 @@ impl IndentationLevel {
 				}
 
 				let mut is_one_line = false;
-				if ["if", "else", "switch", "while", "for"].iter().any(|x| line.trim_left().starts_with(x)) {
+				if ["if ", "else", "switch ", "while ", "for "].iter().any(|x| line.trim_left().starts_with(x)) {
 					if let Some(next_line) = lines.peek() {
 						if !next_line.trim_left().starts_with('{') {
 							is_one_line = true;
@@ -402,6 +402,8 @@ mod tests {
 		assert_eq!(indentation_level.verify("", "{\n    {\n    }\n}   ").len(), 0);
 		assert_eq!(indentation_level.verify("", "if (true)\n    f();").len(), 0);
 		assert_eq!(indentation_level.verify("", "switch (number)\n{\n    case 1:\n        f();\n        break;\n    case 2:\n        return g();\n}").len(), 0);
+		assert_eq!(indentation_level.verify("", "while (condition)\n{\n    if (other_condition)\n        f();\n    else\n        g();\n}").len(), 0);
+		assert_eq!(indentation_level.verify("", "float force;\nforce = 1.4;\nprint(force);").len(), 0);
 
 		//Wrong indentation
 		assert_eq!(indentation_level.verify("", "             ").len(), 1);

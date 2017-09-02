@@ -94,7 +94,7 @@ impl Rule for PreprocessorComment {
 			if line.starts_with("#") && 
 				["endif", "else"].iter().any(|x| line.contains(x)) &&
 				!(line.contains("/*") && line.contains("*/")) && !line.contains("//")  {
-					errors.push(format!("[{}:{}]Else and endif directives must have a comment describing their initial condition.", filename, line_number));
+					errors.push(format!("[{}:{}]#else and #endif directives must have a comment describing their initial condition.", filename, line_number));
 			}
 
 			line_number += 1;

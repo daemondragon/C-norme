@@ -351,7 +351,7 @@ impl Rule for FunctionParametersIndentation {
 				else if in_function_parameters {
 					let current_indentation = line.len() - line.trim_left().len();
 					if current_indentation != parameters_indentation {
-						errors.push(format!("[{}:{}]Wrong parameters indentation level. Expected {} functions, got {}.", filename, line_number, parameters_indentation, current_indentation));
+						errors.push(format!("[{}:{}]Wrong parameters indentation level. Expected {} whitespaces, got {}.", filename, line_number, parameters_indentation, current_indentation));
 					}
 				}
 			}
